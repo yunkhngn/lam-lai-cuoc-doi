@@ -111,7 +111,7 @@ struct SettingsView: View {
             Spacer()
             
             // App Info
-            Text("RedoLife v1.0")
+            Text("Làm lại cuộc đời v1.0 | Developed by @yun.khngn")
                 .font(.system(size: 13))
                 .foregroundStyle(AppColors.textMuted)
                 .frame(maxWidth: .infinity)

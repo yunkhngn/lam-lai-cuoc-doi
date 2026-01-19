@@ -41,7 +41,9 @@ struct ContentView: View {
                                 icon: tab.icon,
                                 isSelected: selectedTab == tab
                             ) {
-                                selectedTab = tab
+                                withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                                    selectedTab = tab
+                                }
                             }
                         }
                     }
@@ -54,30 +56,37 @@ struct ContentView: View {
                     icon: Tab.settings.icon,
                     isSelected: selectedTab == .settings
                 ) {
-                    selectedTab = .settings
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                        selectedTab = .settings
+                    }
                 }
                 .padding(.bottom, 16)
             }
             .frame(width: 72)
             .background(AppColors.bgPrimary)
             
-            // Main Content
+            // Main Content with transition
             ZStack {
                 AppColors.bgPrimary.ignoresSafeArea()
                 
-                switch selectedTab {
-                case .dashboard:
-                    DashboardView()
-                case .calendar:
-                    CalendarView()
-                case .goals:
-                    GoalsView()
-                case .stats:
-                    StatsView()
-                case .settings:
-                    SettingsView()
+                Group {
+                    switch selectedTab {
+                    case .dashboard:
+                        DashboardView()
+                    case .calendar:
+                        CalendarView()
+                    case .goals:
+                        GoalsView()
+                    case .stats:
+                        StatsView()
+                    case .settings:
+                        SettingsView()
+                    }
                 }
+                .transition(.opacity)
+                .id(selectedTab)
             }
+            .animation(.easeInOut(duration: 0.2), value: selectedTab)
         }
         .onAppear {
             viewModel.setContext(modelContext)
@@ -144,6 +153,7 @@ struct IconButton: View {
     let action: () -> Void
     
     @State private var isHovering = false
+    @State private var isPressed = false
     
     var body: some View {
         Button(action: action) {
@@ -155,9 +165,20 @@ struct IconButton: View {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(isSelected ? AppColors.accent.opacity(0.1) : (isHovering ? AppColors.lightGray.opacity(0.5) : Color.clear))
                 )
+                .scaleEffect(isPressed ? 0.9 : 1.0)
+                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isPressed)
         }
         .buttonStyle(.plain)
-        .onHover { isHovering = $0 }
+        .onHover { hovering in
+            withAnimation(.easeInOut(duration: 0.15)) {
+                isHovering = hovering
+            }
+        }
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { _ in isPressed = true }
+                .onEnded { _ in isPressed = false }
+        )
     }
 }
 
