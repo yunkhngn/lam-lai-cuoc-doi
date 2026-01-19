@@ -2,18 +2,14 @@ import SwiftUI
 
 // MARK: - Inspiration Quotes (easy to edit)
 let inspirationQuotes: [String] = [
-    "Hôm nay còn thở\nlà đủ để bắt đầu lại.",
-    "Không cần tốt hơn ai cả.\nChỉ cần chưa bỏ cuộc.",
-    "Nếu mệt,\nđi chậm cũng được.",
-    "Một việc nhỏ hôm nay\nvẫn có ý nghĩa.",
-    "Không sao nếu hôm nay trống rỗng.",
-    "Chỉ cần làm một chút.\nMột chút là đủ.",
-    "Cuộc đời không cần hiểu ngay.\nCứ sống tiếp đã.",
-    "Bạn không lạc hướng.\nBạn chỉ đang nghỉ.",
-    "Không cần cố gắng nhiều.\nChỉ cần đừng biến mất.",
-    "Hôm nay chưa ổn\nkhông có nghĩa là mãi như vậy.",
-    "Làm lại không phải quay về số 0.\nChỉ là đứng dậy chậm hơn.",
-    "Có những ngày tồn tại thôi\ncũng đã là thành công."
+    "Hôm nay cậu vẫn còn đứng dậy\nlà vẫn có thể bước tiếp.",
+    "Không cần tốt hơn ai cả.\nChỉ cần cậu không bỏ cuộc.",
+    "Nếu cậu thấy mệt,\nchậm lại chút cũng được.",
+    "Mọi việc nhỏ hôm nay\nđều có ý nghĩa lớn.",
+    "Không sao cả nếu hôm nay của cậu không ổn.",
+    "Chỉ cần cố thêm chút thôi.\nCố gắng lên nhé!",
+    "Cậu đang không lạc hướng.\nHãy cố gắng nhé!",
+    "Hôm nay cậu chưa ổn\nkhông có nghĩa là mai cũng vậy."
 ]
 
 struct DashboardView: View {

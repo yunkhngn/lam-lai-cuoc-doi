@@ -169,7 +169,7 @@ enum Tab: CaseIterable, Hashable {
         switch self {
         case .dashboard: return "house.fill"
         case .calendar: return "calendar"
-        case .goals: return "checkmark.circle"
+        case .goals: return "target"
         case .stats: return "chart.bar.fill"
         case .settings: return "gearshape"
         }
