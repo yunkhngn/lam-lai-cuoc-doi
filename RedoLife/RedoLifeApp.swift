@@ -22,7 +22,7 @@ struct RedoLifeApp: App {
         }
         .modelContainer(dataManager.modelContainer)
         
-        MenuBarExtra("Làm lại cuộc đời", systemImage: "star.circle") {
+        MenuBarExtra("Làm lại cuộc đời", systemImage: "flame.fill") {
             MenuBarView()
                 .environment(appViewModel)
         }

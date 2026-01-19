@@ -126,7 +126,7 @@ class AppViewModel {
         let percentage = Double(completedCount) / Double(activeRoutines.count)
         
         // Today's XP: percentage * 1204
-        let todayXP = Int(percentage * 1204)
+        let newTodayXP = Int(percentage * 1204)
         
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: logicalToday)
@@ -137,15 +137,13 @@ class AppViewModel {
             let isSameDay = calendar.isDate(lastActiveDay, inSameDayAs: today)
             
             if isSameDay {
-                // Same day - recalculate XP
-                // baseXP stores XP from previous days
-                // We need to track this properly
-                let baseXP = stats.totalXP - previousTodayXP
-                stats.totalXP = baseXP + todayXP
-                previousTodayXP = todayXP
+                // Same day - recalculate XP using persisted todayXP
+                let baseXP = stats.totalXP - stats.todayXP
+                stats.totalXP = baseXP + newTodayXP
+                stats.todayXP = newTodayXP
             } else {
-                // New day - previous day's XP is now locked in
-                previousTodayXP = 0
+                // New day - reset todayXP
+                stats.todayXP = 0
                 
                 let daysDiff = calendar.dateComponents([.day], from: lastActiveDay, to: today).day ?? 0
                 
@@ -158,15 +156,15 @@ class AppViewModel {
                 }
                 
                 // Add today's XP
-                stats.totalXP += todayXP
-                previousTodayXP = todayXP
+                stats.totalXP += newTodayXP
+                stats.todayXP = newTodayXP
                 stats.lastActiveDate = today
             }
         } else {
             // First time ever
             stats.currentStreak = 1
-            stats.totalXP = todayXP
-            previousTodayXP = todayXP
+            stats.totalXP = newTodayXP
+            stats.todayXP = newTodayXP
             stats.lastActiveDate = today
         }
         
@@ -178,9 +176,6 @@ class AppViewModel {
         // Calculate level (every 100 XP = 1 level)
         stats.level = stats.totalXP / 100
     }
-    
-    // Track today's XP for recalculation
-    private var previousTodayXP: Int = 0
     
     // MARK: - Calendar Support
     var monthlyLogs: [UUID: [String: DailyLog]] = [:] // RoutineID -> DateString -> Log

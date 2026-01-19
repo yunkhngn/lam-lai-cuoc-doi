@@ -17,9 +17,11 @@ struct MenuBarView: View {
                 let percent = active.isEmpty ? 0 : Int((Double(done) / Double(active.count)) * 100)
                 
                 Text("\(percent)%")
-                    .font(.caption)
-                    .padding(4)
-                    .background(Capsule().fill(Color.accentColor.opacity(0.2)))
+                    .font(.caption.bold())
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(Capsule().fill(Color.accentColor))
+                    .foregroundColor(.white)
             }
             .padding(.horizontal)
             

@@ -2,14 +2,18 @@ import SwiftUI
 
 // MARK: - Inspiration Quotes (easy to edit)
 let inspirationQuotes: [String] = [
-    "Hôm nay là ngày tuyệt vời\nđể bắt đầu.",
-    "Kiên trì là sức mạnh.",
-    "Bước nhỏ, thay đổi lớn.",
-    "Tin vào bản thân.",
-    "Mỗi ngày mới,\nmột cơ hội mới.",
-    "Đừng bỏ cuộc.",
-    "Bạn đang làm tốt lắm!",
-    "Tiếp tục tiến bước.",
+    "Hôm nay còn thở\nlà đủ để bắt đầu lại.",
+    "Không cần tốt hơn ai cả.\nChỉ cần chưa bỏ cuộc.",
+    "Nếu mệt,\nđi chậm cũng được.",
+    "Một việc nhỏ hôm nay\nvẫn có ý nghĩa.",
+    "Không sao nếu hôm nay trống rỗng.",
+    "Chỉ cần làm một chút.\nMột chút là đủ.",
+    "Cuộc đời không cần hiểu ngay.\nCứ sống tiếp đã.",
+    "Bạn không lạc hướng.\nBạn chỉ đang nghỉ.",
+    "Không cần cố gắng nhiều.\nChỉ cần đừng biến mất.",
+    "Hôm nay chưa ổn\nkhông có nghĩa là mãi như vậy.",
+    "Làm lại không phải quay về số 0.\nChỉ là đứng dậy chậm hơn.",
+    "Có những ngày tồn tại thôi\ncũng đã là thành công."
 ]
 
 struct DashboardView: View {
@@ -100,38 +104,61 @@ struct DashboardView: View {
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(AppColors.textMuted)
                     
-                    VStack(spacing: 0) {
-                        ForEach(viewModel.routines.filter { $0.isActive }) { routine in
-                            let isDone = viewModel.todayLogs[routine.id]?.isDone ?? false
+                    let activeRoutines = viewModel.routines.filter { $0.isActive }
+                    
+                    if activeRoutines.isEmpty {
+                        // Empty State
+                        VStack(spacing: 16) {
+                            Image(systemName: "leaf.fill")
+                                .font(.system(size: 40))
+                                .foregroundStyle(AppColors.accent.opacity(0.3))
                             
-                            Button {
-                                withAnimation(.spring(response: 0.3)) {
-                                    viewModel.toggleRoutine(routine)
-                                }
-                            } label: {
-                                HStack(spacing: 16) {
-                                    Image(systemName: isDone ? "checkmark.circle.fill" : "circle")
-                                        .font(.system(size: 22))
-                                        .foregroundStyle(isDone ? AppColors.green : AppColors.mediumGray.opacity(0.5))
-                                    
-                                    Text(routine.name)
-                                        .font(.system(size: 16))
-                                        .foregroundStyle(isDone ? AppColors.textMuted : AppColors.textPrimary)
-                                        .strikethrough(isDone, color: AppColors.textMuted)
-                                    
-                                    Spacer()
-                                }
-                                .padding(.vertical, 14)
-                            }
-                            .buttonStyle(.plain)
+                            Text("Chưa có thói quen nào")
+                                .font(.system(size: 17, weight: .medium, design: .rounded))
+                                .foregroundStyle(AppColors.textPrimary)
                             
-                            if routine.id != viewModel.routines.filter({ $0.isActive }).last?.id {
-                                Divider()
-                                    .background(AppColors.lightGray)
+                            Text("Nhấn nút + để bắt đầu\nhành trình của bạn")
+                                .font(.system(size: 14))
+                                .foregroundStyle(AppColors.textMuted)
+                                .multilineTextAlignment(.center)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 40)
+                        .card(padding: 20)
+                    } else {
+                        VStack(spacing: 0) {
+                            ForEach(activeRoutines) { routine in
+                                let isDone = viewModel.todayLogs[routine.id]?.isDone ?? false
+                                
+                                Button {
+                                    withAnimation(.spring(response: 0.3)) {
+                                        viewModel.toggleRoutine(routine)
+                                    }
+                                } label: {
+                                    HStack(spacing: 16) {
+                                        Image(systemName: isDone ? "checkmark.circle.fill" : "circle")
+                                            .font(.system(size: 22))
+                                            .foregroundStyle(isDone ? AppColors.green : AppColors.mediumGray.opacity(0.5))
+                                        
+                                        Text(routine.name)
+                                            .font(.system(size: 16))
+                                            .foregroundStyle(isDone ? AppColors.textMuted : AppColors.textPrimary)
+                                            .strikethrough(isDone, color: AppColors.textMuted)
+                                        
+                                        Spacer()
+                                    }
+                                    .padding(.vertical, 14)
+                                }
+                                .buttonStyle(.plain)
+                                
+                                if routine.id != activeRoutines.last?.id {
+                                    Divider()
+                                        .background(AppColors.lightGray)
+                                }
                             }
                         }
+                        .card(padding: 16)
                     }
-                    .card(padding: 16)
                 }
             }
             .padding(.horizontal, 40)
