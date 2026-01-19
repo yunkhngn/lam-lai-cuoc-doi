@@ -6,86 +6,165 @@ struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     
     @AppStorage("userName") private var userName: String = ""
+    @AppStorage("notificationsEnabled") private var notificationsEnabled: Bool = true
+    @AppStorage("morningReminderHour") private var morningHour: Int = 9
+    @AppStorage("eveningReminderHour") private var eveningHour: Int = 21
+    
     @State private var showingResetAlert = false
     @State private var showingResetSuccess = false
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 32) {
-            // Header
-            Text("Cài đặt")
-                .font(.system(size: 28, weight: .semibold, design: .rounded))
-                .foregroundStyle(AppColors.textPrimary)
-                .padding(.top, 40)
-            
-            // Profile Section
-            VStack(alignment: .leading, spacing: 16) {
-                Text("Hồ sơ")
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(AppColors.textMuted)
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 32) {
+                // Header
+                Text("Cài đặt")
+                    .font(.system(size: 28, weight: .semibold, design: .rounded))
+                    .foregroundStyle(AppColors.textPrimary)
+                    .padding(.top, 40)
                 
-                VStack(spacing: 0) {
-                    HStack {
-                        Text("Tên của bạn")
-                            .foregroundStyle(AppColors.textPrimary)
-                        
-                        Spacer()
-                        
-                        TextField("Nhập tên", text: $userName)
-                            .textFieldStyle(.plain)
-                            .multilineTextAlignment(.trailing)
-                            .foregroundStyle(AppColors.textPrimary)
-                            .frame(maxWidth: 200)
+                // Profile Section
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Hồ sơ")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(AppColors.textMuted)
+                    
+                    VStack(spacing: 0) {
+                        HStack {
+                            Text("Tên của bạn")
+                                .foregroundStyle(AppColors.textPrimary)
+                            
+                            Spacer()
+                            
+                            TextField("Nhập tên", text: $userName)
+                                .textFieldStyle(.plain)
+                                .multilineTextAlignment(.trailing)
+                                .foregroundStyle(AppColors.textPrimary)
+                                .frame(maxWidth: 200)
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 14)
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 14)
+                    .card(padding: 0)
                 }
-                .card(padding: 0)
-            }
-            
-            // Data Section
-            VStack(alignment: .leading, spacing: 16) {
-                Text("Dữ liệu")
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(AppColors.textMuted)
                 
-                VStack(spacing: 0) {
-                    // Stats Info
-                    HStack {
-                        Text("Tổng XP")
-                            .foregroundStyle(AppColors.textPrimary)
-                        Spacer()
-                        Text("\(viewModel.playerStats?.totalXP ?? 0)")
-                            .foregroundStyle(AppColors.textMuted)
+                // Notification Section
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Thông báo")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(AppColors.textMuted)
+                    
+                    VStack(spacing: 0) {
+                        // Toggle
+                        HStack {
+                            Image(systemName: "bell.fill")
+                                .foregroundStyle(AppColors.accent)
+                            Text("Bật thông báo")
+                                .foregroundStyle(AppColors.textPrimary)
+                            Spacer()
+                            Toggle("", isOn: $notificationsEnabled)
+                                .toggleStyle(.switch)
+                                .tint(AppColors.accent)
+                                .onChange(of: notificationsEnabled) { _, newValue in
+                                    updateNotifications()
+                                }
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 14)
+                        
+                        if notificationsEnabled {
+                            Divider()
+                            
+                            // Morning time
+                            HStack {
+                                Image(systemName: "sunrise.fill")
+                                    .foregroundStyle(.orange)
+                                Text("Nhắc buổi sáng")
+                                    .foregroundStyle(AppColors.textPrimary)
+                                Spacer()
+                                Picker("", selection: $morningHour) {
+                                    ForEach(5..<12) { hour in
+                                        Text("\(hour):00").tag(hour)
+                                    }
+                                }
+                                .pickerStyle(.menu)
+                                .onChange(of: morningHour) { _, _ in
+                                    updateNotifications()
+                                }
+                            }
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 14)
+                            
+                            Divider()
+                            
+                            // Evening time
+                            HStack {
+                                Image(systemName: "moon.fill")
+                                    .foregroundStyle(.purple)
+                                Text("Nhắc buổi tối")
+                                    .foregroundStyle(AppColors.textPrimary)
+                                Spacer()
+                                Picker("", selection: $eveningHour) {
+                                    ForEach(18..<24) { hour in
+                                        Text("\(hour):00").tag(hour)
+                                    }
+                                }
+                                .pickerStyle(.menu)
+                                .onChange(of: eveningHour) { _, _ in
+                                    updateNotifications()
+                                }
+                            }
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 14)
+                        }
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 14)
-                    
-                    Divider()
-                    
-                    HStack {
-                        Text("Chuỗi ngày tốt nhất")
-                            .foregroundStyle(AppColors.textPrimary)
-                        Spacer()
-                        Text("\(viewModel.playerStats?.bestStreak ?? 0)")
-                            .foregroundStyle(AppColors.textMuted)
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 14)
-                    
-                    Divider()
-                    
-                    HStack {
-                        Text("Số thói quen")
-                            .foregroundStyle(AppColors.textPrimary)
-                        Spacer()
-                        Text("\(viewModel.routines.count)")
-                            .foregroundStyle(AppColors.textMuted)
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 14)
+                    .card(padding: 0)
+                    .animation(.easeInOut(duration: 0.2), value: notificationsEnabled)
                 }
-                .card(padding: 0)
-            }
+                
+                // Data Section
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Dữ liệu")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(AppColors.textMuted)
+                    
+                    VStack(spacing: 0) {
+                        // Stats Info
+                        HStack {
+                            Text("Tổng XP")
+                                .foregroundStyle(AppColors.textPrimary)
+                            Spacer()
+                            Text("\(viewModel.playerStats?.totalXP ?? 0)")
+                                .foregroundStyle(AppColors.textMuted)
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 14)
+                        
+                        Divider()
+                        
+                        HStack {
+                            Text("Chuỗi ngày tốt nhất")
+                                .foregroundStyle(AppColors.textPrimary)
+                            Spacer()
+                            Text("\(viewModel.playerStats?.bestStreak ?? 0)")
+                                .foregroundStyle(AppColors.textMuted)
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 14)
+                        
+                        Divider()
+                        
+                        HStack {
+                            Text("Số thói quen")
+                                .foregroundStyle(AppColors.textPrimary)
+                            Spacer()
+                            Text("\(viewModel.routines.count)")
+                                .foregroundStyle(AppColors.textMuted)
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 14)
+                    }
+                    .card(padding: 0)
+                }
             
             // Danger Zone
             VStack(alignment: .leading, spacing: 16) {
@@ -108,8 +187,6 @@ struct SettingsView: View {
                 .card(padding: 0)
             }
             
-            Spacer()
-            
             // App Info
             Text("Làm lại cuộc đời v1.0 | Developed by @yun.khngn")
                 .font(.system(size: 13))
@@ -118,6 +195,7 @@ struct SettingsView: View {
                 .padding(.bottom, 20)
         }
         .padding(.horizontal, 40)
+        }
         .background(AppColors.bgPrimary.ignoresSafeArea())
         .alert("Xoá dữ liệu?", isPresented: $showingResetAlert) {
             Button("Huỷ", role: .cancel) {}
@@ -131,6 +209,14 @@ struct SettingsView: View {
             Button("OK") {}
         } message: {
             Text("Tất cả dữ liệu đã được xoá.")
+        }
+    }
+    
+    func updateNotifications() {
+        if notificationsEnabled {
+            NotificationManager.shared.scheduleReminders(morningHour: morningHour, eveningHour: eveningHour)
+        } else {
+            NotificationManager.shared.cancelAllNotifications()
         }
     }
     
