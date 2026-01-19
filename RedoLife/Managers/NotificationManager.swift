@@ -36,14 +36,16 @@ class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
     func scheduleDailyReminders() {
         let morningHour = UserDefaults.standard.integer(forKey: "morningReminderHour")
         let eveningHour = UserDefaults.standard.integer(forKey: "eveningReminderHour")
+        let quoteInterval = UserDefaults.standard.integer(forKey: "quoteIntervalHours")
         
         scheduleReminders(
             morningHour: morningHour == 0 ? 9 : morningHour,
-            eveningHour: eveningHour == 0 ? 21 : eveningHour
+            eveningHour: eveningHour == 0 ? 21 : eveningHour,
+            quoteInterval: quoteInterval == 0 ? 1 : quoteInterval
         )
     }
     
-    func scheduleReminders(morningHour: Int, eveningHour: Int) {
+    func scheduleReminders(morningHour: Int, eveningHour: Int, quoteInterval: Int) {
         let center = UNUserNotificationCenter.current()
         center.removeAllPendingNotificationRequests()
         
@@ -65,12 +67,17 @@ class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
             minute: 0
         )
         
-        // 3. Hourly motivational quotes (9 AM to 9 PM)
-        scheduleHourlyQuotes()
+        // 3. Motivational quotes
+        scheduleHourlyQuotes(interval: quoteInterval)
     }
     
-    func scheduleHourlyQuotes() {
-        for hour in 10..<21 { // From 10 AM to 8 PM (skip 9 AM and 9 PM as they have special notifications)
+    func scheduleHourlyQuotes(interval: Int) {
+        // Schedule from 10 AM to 8 PM
+        let startHour = 10
+        let endHour = 20 // Inclusive
+        
+        // Use stride to jump by interval
+        for hour in stride(from: startHour, through: endHour, by: interval) {
             let quoteIndex = hour % motivationalQuotes.count
             let quote = motivationalQuotes[quoteIndex]
             

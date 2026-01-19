@@ -14,6 +14,15 @@ class AppViewModel {
     var dailyLogs: [DailyLog] = []
     var todayLogs: [UUID: DailyLog] = [:] // Map RoutineID -> Log
     
+    // Goals
+    var goals: [Goal] = []
+    
+    var goalsProgress: Double {
+        guard !goals.isEmpty else { return 0 }
+        let completed = goals.filter { $0.isCompleted }.count
+        return Double(completed) / Double(goals.count)
+    }
+    
     var playerStats: PlayerStats?
     
     init() {
@@ -63,6 +72,10 @@ class AppViewModel {
             let routinesDescriptor = FetchDescriptor<Routine>(sortBy: [SortDescriptor(\.order)])
             self.routines = try context.fetch(routinesDescriptor)
             
+            // Fetch Goals
+            let goalsDescriptor = FetchDescriptor<Goal>(sortBy: [SortDescriptor(\.order)])
+            self.goals = try context.fetch(goalsDescriptor)
+            
             // Fetch logs for logical today
             refreshDailyLogs()
             
@@ -108,12 +121,42 @@ class AppViewModel {
             todayLogs[routine.id] = newLog
         }
         
+        lastUpdate = Date()
         updateStats()
         // Save handled by SwiftData autosave or manually if needed
     }
     
+    // Signals for UI updates
+    var lastUpdate: Date = Date()
+    
+    // MARK: - Goal Actions
+    
+    func toggleGoal(_ goal: Goal) {
+        goal.isCompleted.toggle()
+        if goal.isCompleted {
+            goal.completedDate = Date()
+        } else {
+            goal.completedDate = nil
+        }
+        lastUpdate = Date()
+    }
+    
+    func deleteGoal(_ goal: Goal) {
+        guard let context = modelContext else { return }
+        context.delete(goal)
+        fetchData() // this will update goals list
+    }
+    
+    func updateGoal(_ goal: Goal, name: String, deadline: Date?, isLongTerm: Bool) {
+        goal.name = name
+        goal.deadline = deadline
+        goal.isLongTerm = isLongTerm
+        lastUpdate = Date()
+    }
+    
     func updateStats() {
         guard let stats = playerStats else { return }
+        lastUpdate = Date()
         
         // Calculate today's progress
         let activeRoutines = routines.filter { $0.isActive }
@@ -183,6 +226,58 @@ class AppViewModel {
     
     // MARK: - Stats Support
     var last7DaysLogs: [UUID: [String: DailyLog]] = [:] // For StatsView
+    var last90DaysLogs: [Date: [DailyLog]] = [:] // Map Date -> Logs for that day
+    var routineStats: [UUID: (name: String, icon: String, completionCount: Int)] = [:]
+    
+    func fetchActivityData() {
+        guard let context = modelContext else { return }
+        
+        // 1. Fetch 365 Days Logs for Heatmap (1 Year)
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        guard let startDate = calendar.date(byAdding: .day, value: -364, to: today) else { return }
+        
+        let descriptor = FetchDescriptor<DailyLog>(
+            predicate: #Predicate { $0.date >= startDate }
+        )
+        
+        do {
+            let logs = try context.fetch(descriptor)
+            
+            // Organize for Heatmap: Date -> [Logs]
+            var map: [Date: [DailyLog]] = [:]
+            
+            // Stats counting
+            var rStats: [UUID: Int] = [:]
+            
+            for log in logs {
+                // For Heatmap
+                if log.isDone {
+                    let dateKey = calendar.startOfDay(for: log.date)
+                    map[dateKey, default: []].append(log)
+                    
+                    // For Routine Stats
+                    if let rId = log.routine?.id {
+                        rStats[rId, default: 0] += 1
+                    }
+                }
+            }
+            self.last90DaysLogs = map
+            
+            // 2. Prepare Routine Stats
+            var finalStats: [UUID: (name: String, icon: String, completionCount: Int)] = [:]
+            for routine in routines {
+                finalStats[routine.id] = (routine.name, routine.icon, rStats[routine.id] ?? 0)
+            }
+            self.routineStats = finalStats
+            
+            // 3. Update 7 days logs as well
+            fetchLast7DaysLogs()
+            
+        } catch {
+            print("Error fetching activity data: \(error)")
+        }
+    }
     
     func fetchLast7DaysLogs() {
         guard let context = modelContext else { return }

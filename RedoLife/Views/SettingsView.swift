@@ -9,6 +9,7 @@ struct SettingsView: View {
     @AppStorage("notificationsEnabled") private var notificationsEnabled: Bool = true
     @AppStorage("morningReminderHour") private var morningHour: Int = 9
     @AppStorage("eveningReminderHour") private var eveningHour: Int = 21
+    @AppStorage("quoteIntervalHours") private var quoteIntervalHours: Int = 1
     
     @State private var showingResetAlert = false
     @State private var showingResetSuccess = false
@@ -57,13 +58,13 @@ struct SettingsView: View {
                         // Toggle
                         HStack {
                             Image(systemName: "bell.fill")
-                                .foregroundStyle(AppColors.accent)
+                                .foregroundStyle(AppColors.green)
                             Text("Bật thông báo")
                                 .foregroundStyle(AppColors.textPrimary)
                             Spacer()
                             Toggle("", isOn: $notificationsEnabled)
                                 .toggleStyle(.switch)
-                                .tint(AppColors.accent)
+                                .tint(AppColors.green)
                                 .onChange(of: notificationsEnabled) { _, newValue in
                                     updateNotifications()
                                 }
@@ -110,6 +111,28 @@ struct SettingsView: View {
                                 }
                                 .pickerStyle(.menu)
                                 .onChange(of: eveningHour) { _, _ in
+                                    updateNotifications()
+                                }
+                            }
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 14)
+                            // Quote Frequency
+                            Divider()
+                            
+                            HStack {
+                                Image(systemName: "quote.bubble.fill")
+                                    .foregroundStyle(AppColors.green)
+                                Text("Tần suất Quotes")
+                                    .foregroundStyle(AppColors.textPrimary)
+                                Spacer()
+                                Picker("", selection: $quoteIntervalHours) {
+                                    Text("1 giờ").tag(1)
+                                    Text("2 giờ").tag(2)
+                                    Text("3 giờ").tag(3)
+                                    Text("4 giờ").tag(4)
+                                }
+                                .pickerStyle(.menu)
+                                .onChange(of: quoteIntervalHours) { _, _ in
                                     updateNotifications()
                                 }
                             }
@@ -214,7 +237,11 @@ struct SettingsView: View {
     
     func updateNotifications() {
         if notificationsEnabled {
-            NotificationManager.shared.scheduleReminders(morningHour: morningHour, eveningHour: eveningHour)
+            NotificationManager.shared.scheduleReminders(
+                morningHour: morningHour,
+                eveningHour: eveningHour,
+                quoteInterval: quoteIntervalHours
+            )
         } else {
             NotificationManager.shared.cancelAllNotifications()
         }

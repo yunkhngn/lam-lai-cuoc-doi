@@ -10,7 +10,8 @@ class DataManager {
         let schema = Schema([
             Routine.self,
             DailyLog.self,
-            PlayerStats.self
+            PlayerStats.self,
+            Goal.self
         ])
         
         // Try to create container, if migration fails, delete old data

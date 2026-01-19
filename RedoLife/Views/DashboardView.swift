@@ -16,6 +16,8 @@ struct DashboardView: View {
     @Environment(AppViewModel.self) var viewModel
     @AppStorage("userName") private var userName: String = ""
     
+    @State private var animatedProgress: Double = 0
+    
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 32) {
@@ -39,7 +41,7 @@ struct DashboardView: View {
                         Circle()
                             .fill(
                                 RadialGradient(
-                                    colors: [AppColors.accent.opacity(0.2), AppColors.accent.opacity(0)],
+                                    colors: [AppColors.green.opacity(0.2), AppColors.green.opacity(0)],
                                     center: .center,
                                     startRadius: 20,
                                     endRadius: 180
@@ -80,28 +82,27 @@ struct DashboardView: View {
                         HStack(spacing: 0) {
                             // Left: Progress Circle (40%)
                             VStack(spacing: 20) {
-                                let progress = calculateProgress()
-                                
                                 ZStack {
                                     Circle()
                                         .stroke(AppColors.lightGray.opacity(0.5), lineWidth: 12)
                                     Circle()
-                                        .trim(from: 0, to: progress)
+                                        .trim(from: 0, to: animatedProgress)
                                         .stroke(
-                                            LinearGradient(
-                                                colors: [AppColors.accent, AppColors.accent.opacity(0.7)],
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
+                                            AngularGradient(
+                                                colors: [AppColors.green, AppColors.green.opacity(0.8), AppColors.green],
+                                                center: .center,
+                                                startAngle: .degrees(-90),
+                                                endAngle: .degrees(270)
                                             ),
                                             style: StrokeStyle(lineWidth: 12, lineCap: .round)
                                         )
                                         .rotationEffect(.degrees(-90))
-                                        .animation(.spring(duration: 0.6), value: progress)
                                     
                                     VStack(spacing: 2) {
-                                        Text("\(Int(progress * 100))%")
+                                        Text("\(Int(animatedProgress * 100))%")
                                             .font(.system(size: 32, weight: .bold, design: .rounded))
                                             .foregroundStyle(AppColors.textPrimary)
+                                            .contentTransition(.identity)
                                     }
                                 }
                                 .frame(width: 130, height: 130)
@@ -128,7 +129,7 @@ struct DashboardView: View {
                                 VStack(spacing: 16) {
                                     Text("❝")
                                         .font(.system(size: 56, weight: .bold))
-                                        .foregroundStyle(AppColors.accent.opacity(0.15))
+                                        .foregroundStyle(AppColors.green.opacity(0.15))
                                     
                                     Text(randomQuote())
                                         .font(.system(size: 22, weight: .medium, design: .serif))
@@ -160,7 +161,7 @@ struct DashboardView: View {
                         VStack(spacing: 16) {
                             Image(systemName: "leaf.fill")
                                 .font(.system(size: 40))
-                                .foregroundStyle(AppColors.accent.opacity(0.3))
+                                .foregroundStyle(AppColors.green.opacity(0.3))
                             
                             Text("Chưa có thói quen nào")
                                 .font(.system(size: 17, weight: .medium, design: .rounded))
@@ -212,6 +213,18 @@ struct DashboardView: View {
             }
             .padding(.horizontal, 40)
             .padding(.bottom, 40)
+        }
+        .onAppear {
+            // Animate progress on appear
+            animatedProgress = 0
+            withAnimation(.easeOut(duration: 0.8).delay(0.2)) {
+                animatedProgress = calculateProgress()
+            }
+        }
+        .onChange(of: viewModel.lastUpdate) { _, _ in
+            withAnimation(.spring(duration: 0.6)) {
+                animatedProgress = calculateProgress()
+            }
         }
     }
     

@@ -78,7 +78,7 @@ struct CalendarView: View {
                 // Legend
                 HStack(spacing: 24) {
                     LegendItem(color: AppColors.green, label: "Hoàn thành")
-                    LegendItem(color: AppColors.accent.opacity(0.5), label: "Một phần")
+                    LegendItem(color: AppColors.green.opacity(0.5), label: "Một phần")
                     LegendItem(color: AppColors.lightGray, label: "Chưa làm")
                 }
                 .padding(.top, 8)
@@ -224,11 +224,11 @@ struct DayCell: View {
             VStack(spacing: 4) {
                 Text("\(dayNum)")
                     .font(.system(size: 15, weight: isToday ? .semibold : .regular))
-                    .foregroundStyle(isToday ? .white : (isSelected ? AppColors.accent : AppColors.textPrimary))
+                    .foregroundStyle(isToday ? .white : (isSelected ? AppColors.green : AppColors.textPrimary))
                     .frame(width: 32, height: 32)
                     .background(
                         Circle()
-                            .fill(isToday ? AppColors.accent : (isSelected ? AppColors.accent.opacity(0.1) : Color.clear))
+                            .fill(isToday ? AppColors.green : (isSelected ? AppColors.green.opacity(0.1) : Color.clear))
                     )
                 
                 // Completion indicator dot
@@ -245,7 +245,7 @@ struct DayCell: View {
         if completionPercentage >= 1.0 {
             return AppColors.green
         } else if completionPercentage > 0 {
-            return AppColors.accent.opacity(0.6)
+            return AppColors.green.opacity(0.6)
         } else {
             return AppColors.lightGray
         }

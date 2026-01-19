@@ -137,7 +137,7 @@ struct AddRoutineSheetFromSidebar: View {
                 
                 Button("Thêm") { onAdd() }
                     .disabled(name.isEmpty)
-                    .foregroundStyle(name.isEmpty ? AppColors.textMuted : AppColors.accent)
+                    .foregroundStyle(name.isEmpty ? AppColors.textMuted : AppColors.green)
                     .fontWeight(.semibold)
             }
         }
@@ -159,11 +159,11 @@ struct IconButton: View {
         Button(action: action) {
             Image(systemName: icon)
                 .font(.system(size: 18))
-                .foregroundStyle(isSelected ? AppColors.accent : AppColors.mediumGray)
+                .foregroundStyle(isSelected ? AppColors.green : AppColors.mediumGray)
                 .frame(width: 44, height: 44)
                 .background(
                     RoundedRectangle(cornerRadius: 12)
-                        .fill(isSelected ? AppColors.accent.opacity(0.1) : (isHovering ? AppColors.lightGray.opacity(0.5) : Color.clear))
+                        .fill(isSelected ? AppColors.green.opacity(0.1) : (isHovering ? AppColors.lightGray.opacity(0.5) : Color.clear))
                 )
                 .scaleEffect(isPressed ? 0.9 : 1.0)
                 .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isPressed)
