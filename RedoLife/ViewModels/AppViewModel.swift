@@ -125,40 +125,49 @@ class AppViewModel {
         
         let percentage = Double(completedCount) / Double(activeRoutines.count)
         
-        // Award XP: percentage * 1204
+        // Today's XP: percentage * 1204
         let todayXP = Int(percentage * 1204)
         
-        // For streak: check if today is consecutive with last active date
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: logicalToday)
         
+        // Check if we already have a record for today
         if let lastActive = stats.lastActiveDate {
             let lastActiveDay = calendar.startOfDay(for: lastActive)
-            let daysDiff = calendar.dateComponents([.day], from: lastActiveDay, to: today).day ?? 0
+            let isSameDay = calendar.isDate(lastActiveDay, inSameDayAs: today)
             
-            if daysDiff == 1 && percentage >= 0.5 {
-                // Consecutive day with 50%+ completion - continue streak
-                stats.currentStreak += 1
-                stats.totalXP += todayXP
-                stats.lastActiveDate = today
-            } else if daysDiff == 0 {
-                // Same day - don't update streak, but update XP if needed
-                // XP already counted for today
-            } else if daysDiff > 1 {
-                // Streak broken
-                if percentage >= 0.5 {
+            if isSameDay {
+                // Same day - recalculate XP
+                // baseXP stores XP from previous days
+                // We need to track this properly
+                let baseXP = stats.totalXP - previousTodayXP
+                stats.totalXP = baseXP + todayXP
+                previousTodayXP = todayXP
+            } else {
+                // New day - previous day's XP is now locked in
+                previousTodayXP = 0
+                
+                let daysDiff = calendar.dateComponents([.day], from: lastActiveDay, to: today).day ?? 0
+                
+                if daysDiff == 1 {
+                    // Consecutive day
+                    stats.currentStreak += 1
+                } else {
+                    // Streak broken - reset
                     stats.currentStreak = 1
-                    stats.totalXP += todayXP
-                    stats.lastActiveDate = today
                 }
+                
+                // Add today's XP
+                stats.totalXP += todayXP
+                previousTodayXP = todayXP
+                stats.lastActiveDate = today
             }
         } else {
-            // First time
-            if percentage >= 0.5 {
-                stats.currentStreak = 1
-                stats.totalXP = todayXP
-                stats.lastActiveDate = today
-            }
+            // First time ever
+            stats.currentStreak = 1
+            stats.totalXP = todayXP
+            previousTodayXP = todayXP
+            stats.lastActiveDate = today
         }
         
         // Update best streak
@@ -169,6 +178,9 @@ class AppViewModel {
         // Calculate level (every 100 XP = 1 level)
         stats.level = stats.totalXP / 100
     }
+    
+    // Track today's XP for recalculation
+    private var previousTodayXP: Int = 0
     
     // MARK: - Calendar Support
     var monthlyLogs: [UUID: [String: DailyLog]] = [:] // RoutineID -> DateString -> Log

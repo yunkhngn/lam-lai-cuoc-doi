@@ -1,5 +1,17 @@
 import SwiftUI
 
+// MARK: - Inspiration Quotes (easy to edit)
+let inspirationQuotes: [String] = [
+    "Hôm nay là ngày tuyệt vời\nđể bắt đầu.",
+    "Kiên trì là sức mạnh.",
+    "Bước nhỏ, thay đổi lớn.",
+    "Tin vào bản thân.",
+    "Mỗi ngày mới,\nmột cơ hội mới.",
+    "Đừng bỏ cuộc.",
+    "Bạn đang làm tốt lắm!",
+    "Tiếp tục tiến bước.",
+]
+
 struct DashboardView: View {
     @Environment(AppViewModel.self) var viewModel
     
@@ -18,35 +30,69 @@ struct DashboardView: View {
                 }
                 .padding(.top, 40)
                 
-                // Progress Card
-                VStack(spacing: 24) {
-                    let progress = calculateProgress()
-                    
-                    ZStack {
-                        Circle()
-                            .stroke(AppColors.lightGray, lineWidth: 10)
-                        Circle()
-                            .trim(from: 0, to: progress)
-                            .stroke(AppColors.accent, style: StrokeStyle(lineWidth: 10, lineCap: .round))
-                            .rotationEffect(.degrees(-90))
-                            .animation(.spring(duration: 0.6), value: progress)
-                        
-                        VStack(spacing: 4) {
-                            Text("\(Int(progress * 100))%")
-                                .font(.system(size: 28, weight: .bold, design: .rounded))
-                                .foregroundStyle(AppColors.textPrimary)
+                // Progress Card - Split Layout (4:6 ratio)
+                GeometryReader { geo in
+                    HStack(spacing: 0) {
+                        // Left: Progress Circle (40%)
+                        VStack(spacing: 20) {
+                            let progress = calculateProgress()
+                            
+                            ZStack {
+                                Circle()
+                                    .stroke(AppColors.lightGray, lineWidth: 12)
+                                Circle()
+                                    .trim(from: 0, to: progress)
+                                    .stroke(AppColors.accent, style: StrokeStyle(lineWidth: 12, lineCap: .round))
+                                    .rotationEffect(.degrees(-90))
+                                    .animation(.spring(duration: 0.6), value: progress)
+                                
+                                VStack(spacing: 2) {
+                                    Text("\(Int(progress * 100))%")
+                                        .font(.system(size: 32, weight: .bold, design: .rounded))
+                                        .foregroundStyle(AppColors.textPrimary)
+                                }
+                            }
+                            .frame(width: 130, height: 130)
+                            
+                            // Stats
+                            HStack(spacing: 28) {
+                                MiniStat(value: "\(viewModel.playerStats?.currentStreak ?? 0)", label: "Chuỗi")
+                                MiniStat(value: "\(viewModel.playerStats?.totalXP ?? 0)", label: "XP")
+                            }
                         }
-                    }
-                    .frame(width: 100, height: 100)
-                    
-                    // Stats
-                    HStack(spacing: 40) {
-                        MiniStat(value: "\(viewModel.playerStats?.currentStreak ?? 0)", label: "Chuỗi ngày")
-                        MiniStat(value: "\(viewModel.playerStats?.totalXP ?? 0)", label: "XP")
+                        .frame(width: geo.size.width * 0.4)
+                        .frame(maxHeight: .infinity)
+                        
+                        // Divider
+                        Rectangle()
+                            .fill(AppColors.lightGray)
+                            .frame(width: 1)
+                            .padding(.vertical, 32)
+                        
+                        // Right: Inspiration Quote (60%)
+                        VStack {
+                            Spacer()
+                            
+                            VStack(spacing: 16) {
+                                Text("❝")
+                                    .font(.system(size: 56, weight: .bold))
+                                    .foregroundStyle(AppColors.accent.opacity(0.15))
+                                
+                                Text(randomQuote())
+                                    .font(.system(size: 22, weight: .medium, design: .serif))
+                                    .foregroundStyle(AppColors.textPrimary)
+                                    .multilineTextAlignment(.center)
+                                    .lineSpacing(6)
+                                    .padding(.horizontal, 20)
+                            }
+                            
+                            Spacer()
+                        }
+                        .frame(width: geo.size.width * 0.6)
                     }
                 }
-                .frame(maxWidth: .infinity)
-                .card()
+                .frame(height: 280)
+                .card(padding: 0)
                 
                 // Today's Routines
                 VStack(alignment: .leading, spacing: 16) {
@@ -112,6 +158,11 @@ struct DashboardView: View {
         guard !active.isEmpty else { return 0 }
         let done = active.filter { viewModel.todayLogs[$0.id]?.isDone == true }.count
         return Double(done) / Double(active.count)
+    }
+    
+    func randomQuote() -> String {
+        let dayOfYear = Calendar.current.ordinality(of: .day, in: .year, for: Date()) ?? 1
+        return inspirationQuotes[dayOfYear % inspirationQuotes.count]
     }
 }
 

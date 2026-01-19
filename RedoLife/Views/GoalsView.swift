@@ -91,49 +91,27 @@ struct RoutineRow: View {
         ("Ngủ", "bed.double.fill"),
         ("Nước", "drop.fill"),
         ("Lá cây", "leaf.fill"),
-        ("Trái tim", "heart.fill"),
-        ("Mặt trời", "sun.max.fill"),
-        ("Nhạc", "music.note"),
-        ("Tập gym", "dumbbell.fill"),
-        ("Thiền", "brain.head.profile")
+        ("Trái tim", "heart.fill")
     ]
     
     var body: some View {
         HStack(spacing: 16) {
-            // Icon with menu
-            Menu {
-                Section("Đổi icon") {
-                    ForEach(iconOptions, id: \.icon) { option in
-                        Button {
-                            routine.icon = option.icon
-                        } label: {
-                            Label(option.name, systemImage: option.icon)
-                        }
-                    }
-                }
+            // Icon
+            ZStack {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(AppColors.accent.opacity(0.12))
+                    .frame(width: 36, height: 36)
                 
-                Divider()
-                
-                Button(role: .destructive) {
-                    onDelete()
-                } label: {
-                    Label("Xoá", systemImage: "trash")
-                }
-            } label: {
                 Image(systemName: routine.icon)
-                    .font(.system(size: 16))
-                    .foregroundStyle(routine.isActive ? AppColors.accent : AppColors.textMuted)
-                    .frame(width: 32, height: 32)
-                    .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(routine.isActive ? AppColors.accent.opacity(0.1) : AppColors.lightGray)
-                    )
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(Color(hex: "007AFF"))
             }
-            .menuStyle(.borderlessButton)
             
-            TextField("Tên", text: $routine.name)
+            Text(routine.name)
                 .font(.system(size: 16))
                 .foregroundStyle(routine.isActive ? AppColors.textPrimary : AppColors.textMuted)
+            
+            Spacer()
             
             Toggle("", isOn: $routine.isActive)
                 .toggleStyle(.switch)
@@ -143,6 +121,25 @@ struct RoutineRow: View {
         .padding(.vertical, 14)
         .background(isHovering ? AppColors.lightGray.opacity(0.5) : Color.clear)
         .onHover { isHovering = $0 }
+        .contextMenu {
+            Section("Đổi icon") {
+                ForEach(iconOptions, id: \.icon) { option in
+                    Button {
+                        routine.icon = option.icon
+                    } label: {
+                        Label(option.name, systemImage: option.icon)
+                    }
+                }
+            }
+            
+            Divider()
+            
+            Button(role: .destructive) {
+                onDelete()
+            } label: {
+                Label("Xoá", systemImage: "trash")
+            }
+        }
     }
 }
 
@@ -159,8 +156,10 @@ struct AddRoutineSheet: View {
             
             TextField("Tên thói quen", text: $name)
                 .textFieldStyle(.plain)
+                .font(.system(size: 16))
+                .foregroundColor(Color(hex: "1D1D1F"))
                 .padding(16)
-                .background(AppColors.lightGray)
+                .background(Color(hex: "F0F0F5"))
                 .cornerRadius(12)
             
             HStack {
@@ -176,7 +175,7 @@ struct AddRoutineSheet: View {
             }
         }
         .padding(24)
-        .background(AppColors.bgCard.ignoresSafeArea())
+        .background(Color.white.ignoresSafeArea())
     }
 }
 

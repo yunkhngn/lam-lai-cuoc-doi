@@ -18,6 +18,7 @@ struct RedoLifeApp: App {
         WindowGroup {
             ContentView()
                 .environment(appViewModel)
+                .preferredColorScheme(.light)
         }
         .modelContainer(dataManager.modelContainer)
         

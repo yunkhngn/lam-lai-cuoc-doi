@@ -4,13 +4,13 @@ import SwiftUI
 struct AppColors {
     // Core
     static let white = Color.white
-    static let lightGray = Color(hex: "F5F5F7")    // Very light gray bg
-    static let mediumGray = Color(hex: "86868B")   // Muted text
-    static let darkGray = Color(hex: "1D1D1F")     // Primary text
+    static let lightGray = Color(hex: "F5F5F7")
+    static let mediumGray = Color(hex: "86868B")
+    static let darkGray = Color(hex: "1D1D1F")
     
     // Accent
-    static let accent = Color(hex: "007AFF")       // iOS blue
-    static let green = Color(hex: "34C759")        // Success green
+    static let accent = Color(hex: "007AFF")
+    static let green = Color(hex: "34C759")
     
     // Semantic
     static let bgPrimary = lightGray
