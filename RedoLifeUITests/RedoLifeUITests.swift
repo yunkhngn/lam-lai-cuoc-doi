@@ -7,7 +7,7 @@
 
 import XCTest
 
-final class La_m_la_i_cuo__c__o__iUITests: XCTestCase {
+final class RedoLifeUITests: XCTestCase {
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.

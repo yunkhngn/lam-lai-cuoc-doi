@@ -12,37 +12,62 @@
 			containerPortal = 28A2EE962F1DAB83005109A6 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 28A2EE9D2F1DAB83005109A6;
-			remoteInfo = "Làm lại cuộc đời";
+			remoteInfo = RedoLife;
 		};
 		28A2EEB82F1DAB84005109A6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 28A2EE962F1DAB83005109A6 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 28A2EE9D2F1DAB83005109A6;
-			remoteInfo = "Làm lại cuộc đời";
+			remoteInfo = RedoLife;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		28A2EE9E2F1DAB83005109A6 /* Làm lại cuộc đời.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Làm lại cuộc đời.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		28A2EEAD2F1DAB84005109A6 /* Làm lại cuộc đờiTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Làm lại cuộc đờiTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		28A2EEB72F1DAB84005109A6 /* Làm lại cuộc đờiUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Làm lại cuộc đờiUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		28A2EE9E2F1DAB83005109A6 /* RedoLife.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RedoLife.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		28A2EEAD2F1DAB84005109A6 /* RedoLifeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RedoLifeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		28A2EEB72F1DAB84005109A6 /* RedoLifeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RedoLifeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		28A2EF262F1DAF4E005109A6 /* Exceptions for "RedoLife" folder in "RedoLifeTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				appstore.png,
+				Assets.xcassets,
+				playstore.png,
+			);
+			target = 28A2EEAC2F1DAB84005109A6 /* RedoLifeTests */;
+		};
+		28A2EF272F1DAF4E005109A6 /* Exceptions for "RedoLife" folder in "RedoLifeUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				appstore.png,
+				Assets.xcassets,
+				playstore.png,
+			);
+			target = 28A2EEB62F1DAB84005109A6 /* RedoLifeUITests */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		28A2EEA02F1DAB83005109A6 /* Làm lại cuộc đời */ = {
+		28A2EEA02F1DAB83005109A6 /* RedoLife */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "Làm lại cuộc đời";
+			exceptions = (
+				28A2EF262F1DAF4E005109A6 /* Exceptions for "RedoLife" folder in "RedoLifeTests" target */,
+				28A2EF272F1DAF4E005109A6 /* Exceptions for "RedoLife" folder in "RedoLifeUITests" target */,
+			);
+			path = RedoLife;
 			sourceTree = "<group>";
 		};
-		28A2EEB02F1DAB84005109A6 /* Làm lại cuộc đờiTests */ = {
+		28A2EEB02F1DAB84005109A6 /* RedoLifeTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "Làm lại cuộc đờiTests";
+			path = RedoLifeTests;
 			sourceTree = "<group>";
 		};
-		28A2EEBA2F1DAB84005109A6 /* Làm lại cuộc đờiUITests */ = {
+		28A2EEBA2F1DAB84005109A6 /* RedoLifeUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "Làm lại cuộc đờiUITests";
+			path = RedoLifeUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -75,9 +100,9 @@
 		28A2EE952F1DAB83005109A6 = {
 			isa = PBXGroup;
 			children = (
-				28A2EEA02F1DAB83005109A6 /* Làm lại cuộc đời */,
-				28A2EEB02F1DAB84005109A6 /* Làm lại cuộc đờiTests */,
-				28A2EEBA2F1DAB84005109A6 /* Làm lại cuộc đờiUITests */,
+				28A2EEA02F1DAB83005109A6 /* RedoLife */,
+				28A2EEB02F1DAB84005109A6 /* RedoLifeTests */,
+				28A2EEBA2F1DAB84005109A6 /* RedoLifeUITests */,
 				28A2EE9F2F1DAB83005109A6 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -85,9 +110,9 @@
 		28A2EE9F2F1DAB83005109A6 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				28A2EE9E2F1DAB83005109A6 /* Làm lại cuộc đời.app */,
-				28A2EEAD2F1DAB84005109A6 /* Làm lại cuộc đờiTests.xctest */,
-				28A2EEB72F1DAB84005109A6 /* Làm lại cuộc đờiUITests.xctest */,
+				28A2EE9E2F1DAB83005109A6 /* RedoLife.app */,
+				28A2EEAD2F1DAB84005109A6 /* RedoLifeTests.xctest */,
+				28A2EEB72F1DAB84005109A6 /* RedoLifeUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,9 +120,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		28A2EE9D2F1DAB83005109A6 /* Làm lại cuộc đời */ = {
+		28A2EE9D2F1DAB83005109A6 /* RedoLife */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 28A2EEC12F1DAB84005109A6 /* Build configuration list for PBXNativeTarget "Làm lại cuộc đời" */;
+			buildConfigurationList = 28A2EEC12F1DAB84005109A6 /* Build configuration list for PBXNativeTarget "RedoLife" */;
 			buildPhases = (
 				28A2EE9A2F1DAB83005109A6 /* Sources */,
 				28A2EE9B2F1DAB83005109A6 /* Frameworks */,
@@ -108,18 +133,18 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				28A2EEA02F1DAB83005109A6 /* Làm lại cuộc đời */,
+				28A2EEA02F1DAB83005109A6 /* RedoLife */,
 			);
-			name = "Làm lại cuộc đời";
+			name = RedoLife;
 			packageProductDependencies = (
 			);
-			productName = "Làm lại cuộc đời";
-			productReference = 28A2EE9E2F1DAB83005109A6 /* Làm lại cuộc đời.app */;
+			productName = RedoLife;
+			productReference = 28A2EE9E2F1DAB83005109A6 /* RedoLife.app */;
 			productType = "com.apple.product-type.application";
 		};
-		28A2EEAC2F1DAB84005109A6 /* Làm lại cuộc đờiTests */ = {
+		28A2EEAC2F1DAB84005109A6 /* RedoLifeTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 28A2EEC42F1DAB84005109A6 /* Build configuration list for PBXNativeTarget "Làm lại cuộc đờiTests" */;
+			buildConfigurationList = 28A2EEC42F1DAB84005109A6 /* Build configuration list for PBXNativeTarget "RedoLifeTests" */;
 			buildPhases = (
 				28A2EEA92F1DAB84005109A6 /* Sources */,
 				28A2EEAA2F1DAB84005109A6 /* Frameworks */,
@@ -131,18 +156,18 @@
 				28A2EEAF2F1DAB84005109A6 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				28A2EEB02F1DAB84005109A6 /* Làm lại cuộc đờiTests */,
+				28A2EEB02F1DAB84005109A6 /* RedoLifeTests */,
 			);
-			name = "Làm lại cuộc đờiTests";
+			name = RedoLifeTests;
 			packageProductDependencies = (
 			);
-			productName = "Làm lại cuộc đờiTests";
-			productReference = 28A2EEAD2F1DAB84005109A6 /* Làm lại cuộc đờiTests.xctest */;
+			productName = RedoLifeTests;
+			productReference = 28A2EEAD2F1DAB84005109A6 /* RedoLifeTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		28A2EEB62F1DAB84005109A6 /* Làm lại cuộc đờiUITests */ = {
+		28A2EEB62F1DAB84005109A6 /* RedoLifeUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 28A2EEC72F1DAB84005109A6 /* Build configuration list for PBXNativeTarget "Làm lại cuộc đờiUITests" */;
+			buildConfigurationList = 28A2EEC72F1DAB84005109A6 /* Build configuration list for PBXNativeTarget "RedoLifeUITests" */;
 			buildPhases = (
 				28A2EEB32F1DAB84005109A6 /* Sources */,
 				28A2EEB42F1DAB84005109A6 /* Frameworks */,
@@ -154,13 +179,13 @@
 				28A2EEB92F1DAB84005109A6 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				28A2EEBA2F1DAB84005109A6 /* Làm lại cuộc đờiUITests */,
+				28A2EEBA2F1DAB84005109A6 /* RedoLifeUITests */,
 			);
-			name = "Làm lại cuộc đờiUITests";
+			name = RedoLifeUITests;
 			packageProductDependencies = (
 			);
-			productName = "Làm lại cuộc đờiUITests";
-			productReference = 28A2EEB72F1DAB84005109A6 /* Làm lại cuộc đờiUITests.xctest */;
+			productName = RedoLifeUITests;
+			productReference = 28A2EEB72F1DAB84005109A6 /* RedoLifeUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -186,7 +211,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 28A2EE992F1DAB83005109A6 /* Build configuration list for PBXProject "Làm lại cuộc đời" */;
+			buildConfigurationList = 28A2EE992F1DAB83005109A6 /* Build configuration list for PBXProject "RedoLife" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -200,9 +225,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				28A2EE9D2F1DAB83005109A6 /* Làm lại cuộc đời */,
-				28A2EEAC2F1DAB84005109A6 /* Làm lại cuộc đờiTests */,
-				28A2EEB62F1DAB84005109A6 /* Làm lại cuộc đờiUITests */,
+				28A2EE9D2F1DAB83005109A6 /* RedoLife */,
+				28A2EEAC2F1DAB84005109A6 /* RedoLifeTests */,
+				28A2EEB62F1DAB84005109A6 /* RedoLifeUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -258,12 +283,12 @@
 /* Begin PBXTargetDependency section */
 		28A2EEAF2F1DAB84005109A6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 28A2EE9D2F1DAB83005109A6 /* Làm lại cuộc đời */;
+			target = 28A2EE9D2F1DAB83005109A6 /* RedoLife */;
 			targetProxy = 28A2EEAE2F1DAB84005109A6 /* PBXContainerItemProxy */;
 		};
 		28A2EEB92F1DAB84005109A6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 28A2EE9D2F1DAB83005109A6 /* Làm lại cuộc đời */;
+			target = 28A2EE9D2F1DAB83005109A6 /* RedoLife */;
 			targetProxy = 28A2EEB82F1DAB84005109A6 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -392,6 +417,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -399,13 +425,15 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Làm lại cuộc đời";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "yunkhngn.La-m-la-i-cuo--c--o--i";
+				PRODUCT_BUNDLE_IDENTIFIER = yunkhngn.RedoLife;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -422,6 +450,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -429,13 +458,15 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Làm lại cuộc đời";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "yunkhngn.La-m-la-i-cuo--c--o--i";
+				PRODUCT_BUNDLE_IDENTIFIER = yunkhngn.RedoLife;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -456,14 +487,14 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "yunkhngn.La-m-la-i-cuo--c--o--iTests";
+				PRODUCT_BUNDLE_IDENTIFIER = yunkhngn.RedoLifeTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Làm lại cuộc đời.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Làm lại cuộc đời";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RedoLife.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/RedoLife";
 			};
 			name = Debug;
 		};
@@ -476,14 +507,14 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "yunkhngn.La-m-la-i-cuo--c--o--iTests";
+				PRODUCT_BUNDLE_IDENTIFIER = yunkhngn.RedoLifeTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Làm lại cuộc đời.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Làm lại cuộc đời";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RedoLife.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/RedoLife";
 			};
 			name = Release;
 		};
@@ -494,14 +525,14 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "yunkhngn.La-m-la-i-cuo--c--o--iUITests";
+				PRODUCT_BUNDLE_IDENTIFIER = yunkhngn.RedoLifeUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = "Làm lại cuộc đời";
+				TEST_TARGET_NAME = RedoLife;
 			};
 			name = Debug;
 		};
@@ -512,21 +543,21 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "yunkhngn.La-m-la-i-cuo--c--o--iUITests";
+				PRODUCT_BUNDLE_IDENTIFIER = yunkhngn.RedoLifeUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = "Làm lại cuộc đời";
+				TEST_TARGET_NAME = RedoLife;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		28A2EE992F1DAB83005109A6 /* Build configuration list for PBXProject "Làm lại cuộc đời" */ = {
+		28A2EE992F1DAB83005109A6 /* Build configuration list for PBXProject "RedoLife" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				28A2EEBF2F1DAB84005109A6 /* Debug */,
@@ -535,7 +566,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		28A2EEC12F1DAB84005109A6 /* Build configuration list for PBXNativeTarget "Làm lại cuộc đời" */ = {
+		28A2EEC12F1DAB84005109A6 /* Build configuration list for PBXNativeTarget "RedoLife" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				28A2EEC22F1DAB84005109A6 /* Debug */,
@@ -544,7 +575,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		28A2EEC42F1DAB84005109A6 /* Build configuration list for PBXNativeTarget "Làm lại cuộc đờiTests" */ = {
+		28A2EEC42F1DAB84005109A6 /* Build configuration list for PBXNativeTarget "RedoLifeTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				28A2EEC52F1DAB84005109A6 /* Debug */,
@@ -553,7 +584,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		28A2EEC72F1DAB84005109A6 /* Build configuration list for PBXNativeTarget "Làm lại cuộc đờiUITests" */ = {
+		28A2EEC72F1DAB84005109A6 /* Build configuration list for PBXNativeTarget "RedoLifeUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				28A2EEC82F1DAB84005109A6 /* Debug */,
