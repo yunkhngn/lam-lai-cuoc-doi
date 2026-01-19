@@ -9,24 +9,23 @@ struct StatsView: View {
             VStack(spacing: 32) {
                 // Header
                 HStack {
-                    Text("Your Progress")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
+                    Text("Tiến độ của bạn")
+                        .roundedFont(.largeTitle, weight: .bold)
                     Spacer()
                 }
                 .padding(.horizontal)
                 
                 // Key Metrics
                 HStack(spacing: 16) {
-                    StatCard(title: "Streak", value: "\(viewModel.playerStats?.currentStreak ?? 0)", icon: "flame.fill", color: .orange)
-                    StatCard(title: "Best Streak", value: "\(viewModel.playerStats?.bestStreak ?? 0)", icon: "trophy.fill", color: .yellow)
-                    StatCard(title: "Total XP", value: "\(viewModel.playerStats?.totalXP ?? 0)", icon: "star.fill", color: .purple)
+                    StatCard(title: "Chuỗi", value: "\(viewModel.playerStats?.currentStreak ?? 0)", icon: "flame.fill", color: .orange)
+                    StatCard(title: "Chuỗi tốt nhất", value: "\(viewModel.playerStats?.bestStreak ?? 0)", icon: "trophy.fill", color: .yellow)
+                    StatCard(title: "Tổng XP", value: "\(viewModel.playerStats?.totalXP ?? 0)", icon: "star.fill", color: .purple)
                 }
                 .padding(.horizontal)
                 
                 // Weekly Chart
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Last 7 Days (Completion %)")
+                    Text("7 ngày qua (% hoàn thành)")
                         .font(.headline)
                         .padding(.horizontal)
                     
@@ -40,8 +39,8 @@ struct StatsView: View {
                             let value = getCompletionPercent(for: date)
                             
                             BarMark(
-                                x: .value("Day", date, unit: .day),
-                                y: .value("Completion", value * 100)
+                                x: .value("Ngày", date, unit: .day),
+                                y: .value("Hoàn thành", value * 100)
                             )
                             .foregroundStyle(
                                 LinearGradient(colors: [.blue, .purple], startPoint: .bottom, endPoint: .top)
@@ -88,6 +87,7 @@ struct StatsView: View {
     }
 }
 
+// Replaced StatCard with Glass version
 struct StatCard: View {
     var title: String
     var value: String
@@ -95,21 +95,19 @@ struct StatCard: View {
     var color: Color
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Image(systemName: icon)
-                    .foregroundStyle(color)
-                Text(title)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+        GlassCard {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Image(systemName: icon)
+                        .foregroundStyle(color)
+                    Text(title)
+                        .roundedFont(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Text(value)
+                    .roundedFont(.title2, weight: .bold)
             }
-            Text(value)
-                .font(.title2)
-                .fontWeight(.bold)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-        .background(Material.regular)
-        .cornerRadius(12)
     }
 }

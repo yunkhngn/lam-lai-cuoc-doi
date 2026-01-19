@@ -4,107 +4,128 @@ struct CalendarView: View {
     @Environment(AppViewModel.self) var viewModel
     
     var body: some View {
-        VStack {
-            // Header
-            HStack {
-                Text(viewModel.currentMonth.formatted(.dateTime.month(.wide).year()))
-                    .font(.title)
-                    .fontWeight(.bold)
-                Spacer()
-                
+        ScrollView {
+            VStack(spacing: 24) {
+                // Header
                 HStack {
-                    Button {
-                        changeMonth(by: -1)
-                    } label: {
+                    Button(action: { changeMonth(by: -1) }) {
                         Image(systemName: "chevron.left")
+                            .font(.title3)
+                            .foregroundStyle(AppColors.textSecondary)
                     }
-                    Button {
-                        changeMonth(by: 1)
-                    } label: {
+                    .buttonStyle(.plain)
+                    
+                    Spacer()
+                    
+                    Text(monthYearString(from: viewModel.currentMonth))
+                        .roundedFont(.title2, weight: .bold)
+                        .foregroundStyle(AppColors.textPrimary)
+                    
+                    Spacer()
+                    
+                    Button(action: { changeMonth(by: 1) }) {
                         Image(systemName: "chevron.right")
+                            .font(.title3)
+                            .foregroundStyle(AppColors.textSecondary)
                     }
-                    Button("Today") {
-                        viewModel.fetchMonthLogs(for: Date())
+                    .buttonStyle(.plain)
+                }
+                .padding(.horizontal)
+                .padding(.top)
+                
+                // Days of Week Header
+                HStack {
+                    ForEach(0..<7, id: \.self) { index in
+                        Text(weekdayString(from: Calendar.current.date(byAdding: .day, value: index, to: viewModel.currentDate) ?? Date())) // Simplified weekday logic
+                            .roundedFont(.caption, weight: .bold)
+                            .foregroundStyle(AppColors.textSecondary)
+                            .frame(maxWidth: .infinity)
                     }
                 }
-            }
-            .padding()
-            
-            // Grid
-            ScrollView([.horizontal, .vertical]) {
-                Grid(alignment: .center, horizontalSpacing: 1, verticalSpacing: 1) {
-                    // Header Row (Days)
-                    GridRow {
-                        Color.clear.gridCellColumns(1) // Spacer for routine name
-                        ForEach(daysInMonth(), id: \.self) { date in
-                            VStack(spacing: 4) {
-                                Text(date.formatted(.dateTime.weekday(.abbreviated)))
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
-                                Text(date.formatted(.dateTime.day()))
-                                    .font(.caption)
-                                    .fontWeight(Calendar.current.isDateInToday(date) ? .bold : .regular)
-                                    .foregroundStyle(Calendar.current.isDateInToday(date) ? .blue : .primary)
-                            }
-                            .frame(width: 32)
-                            .padding(.vertical, 4)
-                        }
-                    }
-                    
-                    Divider()
-                    
-                    // Routine Rows
-                    ForEach(viewModel.routines.filter { $0.isActive }) { routine in
-                        GridRow {
-                            // Routine Name
-                            HStack {
-                                Image(systemName: routine.icon)
-                                Text(routine.name)
-                                    .lineLimit(1)
-                                Spacer()
-                            }
-                            .frame(width: 150)
-                            .padding(.horizontal)
+                .padding(.horizontal)
+                
+                // Calendar Grid
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 12) {
+                    ForEach(daysInMonth(), id: \.self) { date in
+                        if let date = date {
+                            let isToday = Calendar.current.isDate(date, inSameDayAs: Date())
                             
-                            // Days
-                            ForEach(daysInMonth(), id: \.self) { date in
-                                let dateKey = date.formatted(date: .numeric, time: .omitted)
-                                let isDone = viewModel.monthlyLogs[routine.id]?[dateKey]?.isDone ?? false
+                            VStack(spacing: 4) {
+                                Text("\(Calendar.current.component(.day, from: date))")
+                                    .roundedFont(.body, weight: isToday ? .bold : .regular)
+                                    .foregroundStyle(isToday ? AppColors.neonBlue : AppColors.textPrimary)
                                 
-                                Button {
-                                    withAnimation {
-                                        viewModel.toggleGlobalRoutine(routine, date: date)
-                                    }
-                                } label: {
-                                    ZStack {
-                                        if isDone {
+                                // Dots for logs
+                                HStack(spacing: 2) {
+                                    if let logs = viewModel.monthlyLogs.values.compactMap({ $0[date.formatted(date: .numeric, time: .omitted)] }).filter({ $0.isDone }).prefix(3) {
+                                        ForEach(0..<logs.count, id: \.self) { _ in
                                             Circle()
-                                                .fill(Color.green.opacity(0.8))
-                                                .frame(width: 20, height: 20)
-                                            Image(systemName: "checkmark")
-                                                .font(.caption2)
-                                                .foregroundStyle(.white)
-                                        } else {
-                                            Circle()
-                                                .fill(Color.secondary.opacity(0.1))
-                                                .frame(width: 8, height: 8)
+                                                .fill(AppColors.electricTeal)
+                                                .frame(width: 4, height: 4)
                                         }
                                     }
-                                    .frame(width: 32, height: 32)
-                                    .contentShape(Rectangle()) // Hit test
                                 }
-                                .buttonStyle(.plain)
                             }
+                            .frame(height: 50)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(isToday ? AppColors.neonBlue.opacity(0.15) : Color.clear)
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(isToday ? AppColors.neonBlue.opacity(0.5) : Color.white.opacity(0.05), lineWidth: 1)
+                            )
+                        } else {
+                            Color.clear.frame(height: 50)
                         }
-                        Divider()
                     }
                 }
-                .padding()
+                .padding(.horizontal)
+                
+                // Legend
+                GlassCard {
+                    HStack {
+                        Circle()
+                            .fill(AppColors.electricTeal)
+                            .frame(width: 8, height: 8)
+                        Text("Hoàn thành")
+                            .roundedFont(.caption)
+                            .foregroundStyle(AppColors.textSecondary)
+                        
+                        Spacer()
+                        
+                        Button("Hôm nay") {
+                            withAnimation {
+                                viewModel.currentMonth = Date()
+                                viewModel.fetchMonthLogs(for: Date())
+                            }
+                        }
+                        .foregroundStyle(AppColors.neonBlue)
+                        .roundedFont(.caption, weight: .bold)
+                    }
+                }
+                .padding(.horizontal)
             }
+            .padding(.bottom, 40)
         }
+        .background(AppGradients.deepLiquid.ignoresSafeArea())
         .onAppear {
-            viewModel.fetchMonthLogs(for: Date())
+            viewModel.fetchMonthLogs(for: viewModel.currentMonth)
         }
+    }
+    
+    func monthYearString(from date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMMM yyyy"
+        formatter.locale = Locale(identifier: "vi_VN")
+        return formatter.string(from: date)
+    }
+
+    func weekdayString(from date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEE"
+        formatter.locale = Locale(identifier: "vi_VN")
+        return formatter.string(from: date)
     }
     
     func daysInMonth() -> [Date] {

@@ -27,7 +27,7 @@ struct MenuBarView: View {
             
             // List
             if viewModel.routines.isEmpty {
-                Text("No active routines")
+                Text("Không có thói quen nào")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .padding()
@@ -57,13 +57,13 @@ struct MenuBarView: View {
             
             HStack {
                 Spacer()
-                Button("Open App") {
+                Button("Mở ứng dụng") {
                     NSApp.activate(ignoringOtherApps: true)
                 }
                 .buttonStyle(.link)
                 .font(.caption)
                 
-                Button("Quit") {
+                Button("Thoát") {
                     NSApplication.shared.terminate(nil)
                 }
                 .buttonStyle(.link)

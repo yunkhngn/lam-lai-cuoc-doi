@@ -15,10 +15,10 @@ struct ContentView: View {
     @State private var selectedTab: Tab? = .dashboard
     
     enum Tab: String, CaseIterable, Identifiable {
-        case dashboard = "Overview"
-        case calendar = "History"
-        case goals = "Routines"
-        case stats = "Insights"
+        case dashboard = "Tổng quan"
+        case calendar = "Lịch sử"
+        case goals = "Mục tiêu"
+        case stats = "Thống kê"
         
         var id: String { rawValue }
         
@@ -35,28 +35,43 @@ struct ContentView: View {
     var body: some View {
         NavigationSplitView {
             List(Tab.allCases, selection: $selectedTab) { tab in
-                Label(tab.rawValue, systemImage: tab.icon)
-                    .tag(tab)
+                Label {
+                    Text(tab.rawValue)
+                        .roundedFont(.body, weight: .medium)
+                } icon: {
+                    Image(systemName: tab.icon)
+                }
+                .tag(tab)
+                .listRowBackground(selectedTab == tab ? AppColors.warmOrange.opacity(0.15) : Color.clear)
+                .listRowSeparator(.hidden)
             }
             .navigationSplitViewColumnWidth(min: 200, ideal: 250)
             .listStyle(.sidebar)
+            .scrollContentBackground(.hidden)
+            .background(AppColors.sidebarBG)
         } detail: {
-            switch selectedTab {
-            case .dashboard:
-                DashboardView()
-            case .calendar:
-                CalendarView()
-            case .goals:
-                GoalsView()
-            case .stats:
-                StatsView()
-            case nil:
-                Text("Select an item")
+            ZStack {
+                AppGradients.deepLiquid.ignoresSafeArea()
+                
+                switch selectedTab {
+                case .dashboard:
+                    DashboardView()
+                case .calendar:
+                    CalendarView()
+                case .goals:
+                    GoalsView()
+                case .stats:
+                    StatsView()
+                case nil:
+                    Text("Chọn một mục")
+                        .roundedFont(.title)
+                }
             }
         }
         .onAppear {
             appViewModel.setContext(modelContext)
         }
+        .background(AppGradients.deepLiquid) // Fallback
     }
 }
 

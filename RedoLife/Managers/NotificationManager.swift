@@ -28,8 +28,8 @@ class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
         // 1. Gentle Morning specific time (e.g. 9 AM)
         scheduleNotification(
             identifier: "daily_reminder",
-            title: "Good Morning",
-            body: "Ready to make today count?",
+            title: "Chào buổi sáng",
+            body: "Sẵn sàng cho một ngày ý nghĩa chưa?",
             hour: 9,
             minute: 0
         )
@@ -37,8 +37,8 @@ class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
         // 2. End of Day Recap (e.g. 9 PM)
         scheduleNotification(
             identifier: "evening_recap",
-            title: "Evening Check-in",
-            body: "Take a moment to reflect on your day.",
+            title: "Tổng kết cuối ngày",
+            body: "Dành chút thời gian nhìn lại ngày hôm nay nhé.",
             hour: 21,
             minute: 0
         )

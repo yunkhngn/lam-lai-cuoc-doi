@@ -9,64 +9,88 @@ struct GoalsView: View {
     @State private var isAddingNew = false
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Header
-            HStack {
-                Text("Goals & Routines")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                Spacer()
-                Button {
-                    isAddingNew.toggle()
-                } label: {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title)
-                        .foregroundStyle(.blue)
-                }
-                .buttonStyle(.plain)
-            }
-            .padding()
-            
-            // Add New Section
-            if isAddingNew {
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 24) {
+                // Header
                 HStack {
-                    TextField("New Routine Name", text: $newRoutineName)
-                        .textFieldStyle(.roundedBorder)
-                        .onSubmit {
-                            addNewRoutine()
+                    Text("Mục tiêu & Thói quen")
+                        .roundedFont(.largeTitle, weight: .bold)
+                    Spacer()
+                    Button {
+                        withAnimation {
+                            isAddingNew.toggle()
                         }
-                    
-                    Button("Add") {
-                        addNewRoutine()
+                    } label: {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 32))
+                            .foregroundStyle(AppColors.neonBlue)
+                            .shadow(radius: 5)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .disabled(newRoutineName.isEmpty)
+                    .buttonStyle(.plain)
                 }
                 .padding(.horizontal)
-                .padding(.bottom)
-                .transition(.move(edge: .top).combined(with: .opacity))
-            }
-            
-            // List
-            List {
-                Section("Active") {
-                    ForEach(viewModel.routines.filter { $0.isActive }) { routine in
-                        RoutineEditRow(routine: routine)
+                .padding(.top)
+                
+                // Add New Section (Floating Bubble)
+                if isAddingNew {
+                    GlassCard {
+                        HStack {
+                            TextField("Tên thói quen mới", text: $newRoutineName)
+                                .textFieldStyle(.plain)
+                                .roundedFont(.body)
+                                .onSubmit {
+                                    addNewRoutine()
+                                }
+                            
+                            Button("Thêm") {
+                                addNewRoutine()
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(AppColors.neonBlue)
+                            .disabled(newRoutineName.isEmpty)
+                        }
                     }
-                    .onDelete(perform: deleteActiveRoutines)
-                    .onMove(perform: moveActiveRoutines)
+                    .padding(.horizontal)
+                    .transition(.scale.combined(with: .opacity).combined(with: .move(edge: .top)))
                 }
                 
-                Section("Archived") {
-                    ForEach(viewModel.routines.filter { !$0.isActive }) { routine in
-                        RoutineEditRow(routine: routine)
+                // Active Routines
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Đang thực hiện")
+                        .roundedFont(.headline)
+                        .padding(.horizontal)
+                    
+                    ForEach(viewModel.routines.filter { $0.isActive }) { routine in
+                        GlassCard(padding: 12) {
+                            RoutineEditRow(routine: routine)
+                        }
+                        .padding(.horizontal)
                     }
-                    .onDelete(perform: deleteInactiveRoutines)
+                }
+                
+                // Archived Routines
+                if !viewModel.routines.filter({ !$0.isActive }).isEmpty {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Đã lưu trữ")
+                            .roundedFont(.headline)
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal)
+                        
+                        ForEach(viewModel.routines.filter { !$0.isActive }) { routine in
+                            GlassCard(padding: 12) {
+                                RoutineEditRow(routine: routine)
+                                    .opacity(0.6)
+                            }
+                            .padding(.horizontal)
+                        }
+                    }
+                    .padding(.top)
                 }
             }
-            .scrollContentBackground(.hidden)
-            .background(Color.clear)
+            .padding(.bottom, 80)
         }
+    }
         .onAppear {
             // Ensure data is refreshed
             viewModel.fetchData()
@@ -131,7 +155,7 @@ struct RoutineEditRow: View {
                     Button {
                         routine.icon = icon
                     } label: {
-                        Label("Select", systemImage: icon)
+                        Label("Chọn", systemImage: icon)
                     }
                 }
             } label: {
@@ -141,12 +165,12 @@ struct RoutineEditRow: View {
             .menuStyle(.borderlessButton)
             .frame(width: 32)
             
-            TextField("Name", text: $routine.name)
+            TextField("Tên", text: $routine.name)
                 .textFieldStyle(.plain)
             
             Spacer()
             
-            Toggle("Active", isOn: $routine.isActive)
+            Toggle("Kích hoạt", isOn: $routine.isActive)
                 .labelsHidden()
                 .toggleStyle(.switch)
                 .scaleEffect(0.8)
