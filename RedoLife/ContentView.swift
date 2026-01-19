@@ -5,41 +5,52 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     
     @State private var selectedTab: Tab = .dashboard
+    @State private var isHoveringNew = false
     
     var body: some View {
         HStack(spacing: 0) {
-            // Custom Sidebar
-            VStack(alignment: .leading, spacing: 8) {
-                // App Title
-                Text("Làm lại cuộc đời")
-                    .roundedFont(.headline, weight: .bold)
-                    .foregroundStyle(AppColors.forest)
-                    .padding(.horizontal, 16)
-                    .padding(.top, 20)
-                    .padding(.bottom, 12)
+            // Ultra-minimal Icon Sidebar
+            VStack(spacing: 0) {
+                // New button at top
+                Button {
+                    // Add new routine action
+                } label: {
+                    Image(systemName: "plus")
+                        .font(.system(size: 18, weight: .medium))
+                        .foregroundStyle(AppColors.darkGray)
+                        .frame(width: 44, height: 44)
+                        .background(
+                            Circle()
+                                .fill(isHoveringNew ? AppColors.lightGray : AppColors.white)
+                                .shadow(color: .black.opacity(0.08), radius: 8, y: 2)
+                        )
+                }
+                .buttonStyle(.plain)
+                .onHover { isHoveringNew = $0 }
+                .padding(.top, 16)
+                .padding(.bottom, 24)
                 
-                // Navigation Items
-                ForEach(Tab.allCases, id: \.self) { tab in
-                    SidebarItem(
-                        tab: tab,
-                        isSelected: selectedTab == tab
-                    ) {
-                        selectedTab = tab
+                // Nav Icons
+                VStack(spacing: 8) {
+                    ForEach(Tab.allCases, id: \.self) { tab in
+                        IconButton(
+                            icon: tab.icon,
+                            isSelected: selectedTab == tab
+                        ) {
+                            selectedTab = tab
+                        }
                     }
                 }
                 
                 Spacer()
             }
-            .frame(width: 200)
-            .background(AppColors.cream)
+            .frame(width: 72)
+            .background(AppColors.bgPrimary)
             
-            // Divider
-            Rectangle()
-                .fill(AppColors.lightSage)
-                .frame(width: 1)
-            
-            // Detail View
-            Group {
+            // Main Content
+            ZStack {
+                AppColors.bgPrimary.ignoresSafeArea()
+                
                 switch selectedTab {
                 case .dashboard:
                     DashboardView()
@@ -51,18 +62,16 @@ struct ContentView: View {
                     StatsView()
                 }
             }
-            .frame(maxWidth: .infinity)
         }
-        .background(AppColors.bgPrimary)
         .onAppear {
             viewModel.setContext(modelContext)
         }
     }
 }
 
-// MARK: - Sidebar Item
-struct SidebarItem: View {
-    let tab: Tab
+// MARK: - Icon Button
+struct IconButton: View {
+    let icon: String
     let isSelected: Bool
     let action: () -> Void
     
@@ -70,31 +79,17 @@ struct SidebarItem: View {
     
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 12) {
-                Image(systemName: tab.icon)
-                    .font(.system(size: 16, weight: .medium))
-                    .frame(width: 24)
-                
-                Text(tab.title)
-                    .roundedFont(.body, weight: isSelected ? .semibold : .regular)
-                
-                Spacer()
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
-            .foregroundStyle(isSelected ? AppColors.offWhite : (isHovering ? AppColors.forest : AppColors.sage))
-            .background(
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(isSelected ? AppColors.forest : (isHovering ? AppColors.forest.opacity(0.1) : Color.clear))
-            )
-            .padding(.horizontal, 8)
+            Image(systemName: icon)
+                .font(.system(size: 18))
+                .foregroundStyle(isSelected ? AppColors.accent : AppColors.mediumGray)
+                .frame(width: 44, height: 44)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(isSelected ? AppColors.accent.opacity(0.1) : (isHovering ? AppColors.lightGray.opacity(0.5) : Color.clear))
+                )
         }
         .buttonStyle(.plain)
-        .onHover { hovering in
-            withAnimation(.easeInOut(duration: 0.15)) {
-                isHovering = hovering
-            }
-        }
+        .onHover { isHovering = $0 }
     }
 }
 
@@ -102,20 +97,11 @@ struct SidebarItem: View {
 enum Tab: CaseIterable, Hashable {
     case dashboard, calendar, goals, stats
     
-    var title: String {
-        switch self {
-        case .dashboard: return "Tổng quan"
-        case .calendar: return "Lịch sử"
-        case .goals: return "Mục tiêu"
-        case .stats: return "Thống kê"
-        }
-    }
-    
     var icon: String {
         switch self {
         case .dashboard: return "house.fill"
         case .calendar: return "calendar"
-        case .goals: return "target"
+        case .goals: return "checkmark.circle"
         case .stats: return "chart.bar.fill"
         }
     }

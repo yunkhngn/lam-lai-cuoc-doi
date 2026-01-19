@@ -1,34 +1,39 @@
 import SwiftUI
 
-// MARK: - Peaceful & Caring Palette
+// MARK: - Ultra Minimal Palette
 struct AppColors {
-    // Primary
-    static let forest = Color(hex: "193C1F")      // Dark forest green - accent
-    static let sage = Color(hex: "8EA087")        // Sage green - secondary
+    // Core
+    static let white = Color.white
+    static let lightGray = Color(hex: "F5F5F7")    // Very light gray bg
+    static let mediumGray = Color(hex: "86868B")   // Muted text
+    static let darkGray = Color(hex: "1D1D1F")     // Primary text
     
-    // Neutrals
-    static let tan = Color(hex: "D1B698")         // Warm tan - highlights
-    static let cream = Color(hex: "EDE4D8")       // Cream - cards
-    static let lightSage = Color(hex: "D0D5CB")   // Light sage - borders
-    static let offWhite = Color(hex: "F7F3ED")    // Off-white - background
+    // Accent
+    static let accent = Color(hex: "007AFF")       // iOS blue
+    static let green = Color(hex: "34C759")        // Success green
     
     // Semantic
-    static let bgPrimary = offWhite
-    static let bgCard = cream
-    static let accent = forest
-    static let accentSecondary = sage
-    static let textPrimary = forest
-    static let textMuted = sage
+    static let bgPrimary = lightGray
+    static let bgCard = white
+    static let textPrimary = darkGray
+    static let textMuted = mediumGray
+    
+    // Compatibility
+    static let forest = darkGray
+    static let sage = mediumGray
+    static let cream = white
+    static let offWhite = lightGray
+    static let tan = accent
 }
 
 // MARK: - View Modifiers
 extension View {
-    func card(padding: CGFloat = 16) -> some View {
+    func card(padding: CGFloat = 20) -> some View {
         self
             .padding(padding)
             .background(AppColors.bgCard)
             .cornerRadius(16)
-            .shadow(color: AppColors.forest.opacity(0.05), radius: 8, y: 4)
+            .shadow(color: .black.opacity(0.04), radius: 12, y: 2)
     }
     
     func roundedFont(_ style: Font.TextStyle, weight: Font.Weight = .regular) -> some View {

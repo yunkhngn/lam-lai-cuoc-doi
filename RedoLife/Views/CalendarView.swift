@@ -6,14 +6,14 @@ struct CalendarView: View {
     private let weekdays = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"]
     
     var body: some View {
-        VStack(spacing: 24) {
+        VStack(alignment: .leading, spacing: 32) {
             // Header
             HStack {
                 Button {
                     changeMonth(by: -1)
                 } label: {
                     Image(systemName: "chevron.left")
-                        .font(.title3)
+                        .font(.system(size: 16, weight: .medium))
                         .foregroundStyle(AppColors.textMuted)
                 }
                 .buttonStyle(.plain)
@@ -21,7 +21,7 @@ struct CalendarView: View {
                 Spacer()
                 
                 Text(monthYearString())
-                    .roundedFont(.title2, weight: .bold)
+                    .font(.system(size: 20, weight: .semibold, design: .rounded))
                     .foregroundStyle(AppColors.textPrimary)
                 
                 Spacer()
@@ -30,92 +30,66 @@ struct CalendarView: View {
                     changeMonth(by: 1)
                 } label: {
                     Image(systemName: "chevron.right")
-                        .font(.title3)
+                        .font(.system(size: 16, weight: .medium))
                         .foregroundStyle(AppColors.textMuted)
                 }
                 .buttonStyle(.plain)
             }
-            .padding(.horizontal)
-            .padding(.top, 20)
+            .padding(.top, 40)
             
-            // Weekday Header
-            HStack {
-                ForEach(weekdays, id: \.self) { day in
-                    Text(day)
-                        .roundedFont(.caption, weight: .semibold)
-                        .foregroundStyle(AppColors.textMuted)
-                        .frame(maxWidth: .infinity)
+            // Calendar Card
+            VStack(spacing: 20) {
+                // Weekday Header
+                HStack {
+                    ForEach(weekdays, id: \.self) { day in
+                        Text(day)
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(AppColors.textMuted)
+                            .frame(maxWidth: .infinity)
+                    }
                 }
-            }
-            .padding(.horizontal)
-            
-            // Calendar Grid
-            let days = generateCalendarDays()
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 8) {
-                ForEach(days.indices, id: \.self) { index in
-                    let day = days[index]
-                    
-                    if let date = day {
-                        let isToday = Calendar.current.isDateInToday(date)
-                        let dayNum = Calendar.current.component(.day, from: date)
+                
+                // Calendar Grid
+                let days = generateCalendarDays()
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 12) {
+                    ForEach(days.indices, id: \.self) { index in
+                        let day = days[index]
                         
-                        Text("\(dayNum)")
-                            .roundedFont(.body, weight: isToday ? .bold : .regular)
-                            .foregroundStyle(isToday ? AppColors.offWhite : AppColors.textPrimary)
-                            .frame(width: 40, height: 40)
-                            .background(
-                                Circle()
-                                    .fill(isToday ? AppColors.forest : Color.clear)
-                            )
-                    } else {
-                        Color.clear
-                            .frame(width: 40, height: 40)
+                        if let date = day {
+                            let isToday = Calendar.current.isDateInToday(date)
+                            let dayNum = Calendar.current.component(.day, from: date)
+                            
+                            Text("\(dayNum)")
+                                .font(.system(size: 15, weight: isToday ? .semibold : .regular))
+                                .foregroundStyle(isToday ? .white : AppColors.textPrimary)
+                                .frame(width: 36, height: 36)
+                                .background(
+                                    Circle()
+                                        .fill(isToday ? AppColors.accent : Color.clear)
+                                )
+                        } else {
+                            Color.clear
+                                .frame(width: 36, height: 36)
+                        }
                     }
                 }
             }
-            .padding(.horizontal)
+            .card()
             
             Spacer()
-            
-            // Today Button
-            HStack {
-                Circle()
-                    .fill(AppColors.forest)
-                    .frame(width: 8, height: 8)
-                Text("Hoàn thành")
-                    .roundedFont(.caption)
-                    .foregroundStyle(AppColors.textMuted)
-                
-                Spacer()
-                
-                Button("Hôm nay") {
-                    withAnimation {
-                        viewModel.currentMonth = Date()
-                        viewModel.fetchMonthLogs(for: Date())
-                    }
-                }
-                .roundedFont(.subheadline, weight: .semibold)
-                .foregroundStyle(AppColors.forest)
-            }
-            .padding()
-            .background(AppColors.bgCard)
-            .cornerRadius(16)
-            .shadow(color: AppColors.forest.opacity(0.05), radius: 8, y: 4)
-            .padding(.horizontal)
-            .padding(.bottom, 20)
         }
+        .padding(.horizontal, 40)
         .background(AppColors.bgPrimary.ignoresSafeArea())
         .onAppear {
             viewModel.fetchMonthLogs(for: viewModel.currentMonth)
         }
     }
     
-    // MARK: - Helpers
     func monthYearString() -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "MMMM yyyy"
         formatter.locale = Locale(identifier: "vi_VN")
-        return formatter.string(from: viewModel.currentMonth)
+        return formatter.string(from: viewModel.currentMonth).capitalized
     }
     
     func generateCalendarDays() -> [Date?] {

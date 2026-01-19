@@ -9,11 +9,11 @@ struct GoalsView: View {
     @State private var showingAddSheet = false
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 32) {
             // Header
             HStack {
-                Text("Mục tiêu & Thói quen")
-                    .roundedFont(.largeTitle, weight: .bold)
+                Text("Thói quen")
+                    .font(.system(size: 28, weight: .semibold, design: .rounded))
                     .foregroundStyle(AppColors.textPrimary)
                 
                 Spacer()
@@ -21,49 +21,41 @@ struct GoalsView: View {
                 Button {
                     showingAddSheet = true
                 } label: {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title2)
-                        .foregroundStyle(AppColors.forest)
+                    Image(systemName: "plus")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(AppColors.accent)
+                        .frame(width: 36, height: 36)
+                        .background(AppColors.accent.opacity(0.1))
+                        .cornerRadius(10)
                 }
                 .buttonStyle(.plain)
             }
-            .padding()
+            .padding(.top, 40)
             
-            // Active Routines
-            List {
-                Section {
-                    ForEach(viewModel.routines.filter { $0.isActive }) { routine in
-                        RoutineRow(routine: routine)
-                    }
-                    .onDelete(perform: deleteRoutines)
-                } header: {
-                    Text("Đang thực hiện")
-                        .roundedFont(.subheadline, weight: .semibold)
-                        .foregroundStyle(AppColors.textMuted)
-                }
-                
-                if !viewModel.routines.filter({ !$0.isActive }).isEmpty {
-                    Section {
-                        ForEach(viewModel.routines.filter { !$0.isActive }) { routine in
-                            RoutineRow(routine: routine)
-                                .opacity(0.6)
-                        }
-                    } header: {
-                        Text("Đã lưu trữ")
-                            .roundedFont(.subheadline, weight: .semibold)
-                            .foregroundStyle(AppColors.textMuted)
+            // Routines List
+            VStack(spacing: 0) {
+                ForEach(viewModel.routines) { routine in
+                    RoutineRow(routine: routine, onDelete: {
+                        deleteRoutine(routine)
+                    })
+                    
+                    if routine.id != viewModel.routines.last?.id {
+                        Divider()
+                            .background(AppColors.lightGray)
                     }
                 }
             }
-            .listStyle(.plain)
-            .scrollContentBackground(.hidden)
+            .card(padding: 0)
+            
+            Spacer()
         }
+        .padding(.horizontal, 40)
         .background(AppColors.bgPrimary.ignoresSafeArea())
         .sheet(isPresented: $showingAddSheet) {
             AddRoutineSheet(name: $newRoutineName) {
                 addRoutine()
             }
-            .presentationDetents([.height(200)])
+            .presentationDetents([.height(180)])
         }
         .onAppear {
             viewModel.fetchData()
@@ -79,68 +71,96 @@ struct GoalsView: View {
         viewModel.fetchData()
     }
     
-    func deleteRoutines(at offsets: IndexSet) {
-        let active = viewModel.routines.filter { $0.isActive }
-        for index in offsets {
-            modelContext.delete(active[index])
-        }
+    func deleteRoutine(_ routine: Routine) {
+        modelContext.delete(routine)
         viewModel.fetchData()
     }
 }
 
-// MARK: - Routine Row
 struct RoutineRow: View {
     @Bindable var routine: Routine
+    let onDelete: () -> Void
     
-    let icons = ["star.fill", "flame.fill", "book.fill", "figure.run", "bed.double.fill", "drop.fill", "leaf.fill", "heart.fill"]
+    @State private var isHovering = false
+    
+    let iconOptions: [(name: String, icon: String)] = [
+        ("Ngôi sao", "star.fill"),
+        ("Lửa", "flame.fill"),
+        ("Sách", "book.fill"),
+        ("Chạy bộ", "figure.run"),
+        ("Ngủ", "bed.double.fill"),
+        ("Nước", "drop.fill"),
+        ("Lá cây", "leaf.fill"),
+        ("Trái tim", "heart.fill"),
+        ("Mặt trời", "sun.max.fill"),
+        ("Nhạc", "music.note"),
+        ("Tập gym", "dumbbell.fill"),
+        ("Thiền", "brain.head.profile")
+    ]
     
     var body: some View {
-        HStack {
+        HStack(spacing: 16) {
+            // Icon with menu
             Menu {
-                ForEach(icons, id: \.self) { icon in
-                    Button {
-                        routine.icon = icon
-                    } label: {
-                        Label(icon, systemImage: icon)
+                Section("Đổi icon") {
+                    ForEach(iconOptions, id: \.icon) { option in
+                        Button {
+                            routine.icon = option.icon
+                        } label: {
+                            Label(option.name, systemImage: option.icon)
+                        }
                     }
+                }
+                
+                Divider()
+                
+                Button(role: .destructive) {
+                    onDelete()
+                } label: {
+                    Label("Xoá", systemImage: "trash")
                 }
             } label: {
                 Image(systemName: routine.icon)
-                    .font(.title3)
-                    .foregroundStyle(AppColors.forest)
-                    .frame(width: 32)
+                    .font(.system(size: 16))
+                    .foregroundStyle(routine.isActive ? AppColors.accent : AppColors.textMuted)
+                    .frame(width: 32, height: 32)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(routine.isActive ? AppColors.accent.opacity(0.1) : AppColors.lightGray)
+                    )
             }
             .menuStyle(.borderlessButton)
             
             TextField("Tên", text: $routine.name)
-                .roundedFont(.body)
-                .foregroundStyle(AppColors.textPrimary)
+                .font(.system(size: 16))
+                .foregroundStyle(routine.isActive ? AppColors.textPrimary : AppColors.textMuted)
             
             Toggle("", isOn: $routine.isActive)
                 .toggleStyle(.switch)
-                .tint(AppColors.forest)
+                .tint(AppColors.accent)
         }
-        .padding(.vertical, 4)
-        .listRowBackground(AppColors.bgCard)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 14)
+        .background(isHovering ? AppColors.lightGray.opacity(0.5) : Color.clear)
+        .onHover { isHovering = $0 }
     }
 }
 
-// MARK: - Add Sheet
 struct AddRoutineSheet: View {
     @Binding var name: String
     let onAdd: () -> Void
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
-        VStack(spacing: 20) {
-            Text("Thêm thói quen mới")
-                .roundedFont(.headline, weight: .bold)
+        VStack(spacing: 24) {
+            Text("Thêm thói quen")
+                .font(.system(size: 18, weight: .semibold, design: .rounded))
                 .foregroundStyle(AppColors.textPrimary)
             
             TextField("Tên thói quen", text: $name)
                 .textFieldStyle(.plain)
-                .padding()
-                .background(AppColors.cream)
+                .padding(16)
+                .background(AppColors.lightGray)
                 .cornerRadius(12)
             
             HStack {
@@ -149,15 +169,14 @@ struct AddRoutineSheet: View {
                 
                 Spacer()
                 
-                Button("Thêm") {
-                    onAdd()
-                }
-                .disabled(name.isEmpty)
-                .foregroundStyle(name.isEmpty ? AppColors.textMuted : AppColors.forest)
+                Button("Thêm") { onAdd() }
+                    .disabled(name.isEmpty)
+                    .foregroundStyle(name.isEmpty ? AppColors.textMuted : AppColors.accent)
+                    .fontWeight(.semibold)
             }
         }
-        .padding()
-        .background(AppColors.bgPrimary.ignoresSafeArea())
+        .padding(24)
+        .background(AppColors.bgCard.ignoresSafeArea())
     }
 }
 

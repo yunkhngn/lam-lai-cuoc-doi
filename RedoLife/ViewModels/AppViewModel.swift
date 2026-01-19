@@ -125,17 +125,86 @@ class AppViewModel {
         
         let percentage = Double(completedCount) / Double(activeRoutines.count)
         
-        // NOTE: Real stats update (streak) should probably happen at end of day or when opening app next day.
-        // For XP, we can update immediately or strictly.
-        // Let's implement simple XP addition for now.
-        // A robust system needs to track if XP was already awarded for today.
+        // Award XP: percentage * 1204
+        let todayXP = Int(percentage * 1204)
         
-        // This is a simplified version. In a real app we'd verify "hasXPBeenAwardedToday".
+        // For streak: check if today is consecutive with last active date
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: logicalToday)
+        
+        if let lastActive = stats.lastActiveDate {
+            let lastActiveDay = calendar.startOfDay(for: lastActive)
+            let daysDiff = calendar.dateComponents([.day], from: lastActiveDay, to: today).day ?? 0
+            
+            if daysDiff == 1 && percentage >= 0.5 {
+                // Consecutive day with 50%+ completion - continue streak
+                stats.currentStreak += 1
+                stats.totalXP += todayXP
+                stats.lastActiveDate = today
+            } else if daysDiff == 0 {
+                // Same day - don't update streak, but update XP if needed
+                // XP already counted for today
+            } else if daysDiff > 1 {
+                // Streak broken
+                if percentage >= 0.5 {
+                    stats.currentStreak = 1
+                    stats.totalXP += todayXP
+                    stats.lastActiveDate = today
+                }
+            }
+        } else {
+            // First time
+            if percentage >= 0.5 {
+                stats.currentStreak = 1
+                stats.totalXP = todayXP
+                stats.lastActiveDate = today
+            }
+        }
+        
+        // Update best streak
+        if stats.currentStreak > stats.bestStreak {
+            stats.bestStreak = stats.currentStreak
+        }
+        
+        // Calculate level (every 100 XP = 1 level)
+        stats.level = stats.totalXP / 100
     }
     
     // MARK: - Calendar Support
     var monthlyLogs: [UUID: [String: DailyLog]] = [:] // RoutineID -> DateString -> Log
     var currentMonth: Date = Date()
+    
+    // MARK: - Stats Support
+    var last7DaysLogs: [UUID: [String: DailyLog]] = [:] // For StatsView
+    
+    func fetchLast7DaysLogs() {
+        guard let context = modelContext else { return }
+        
+        let calendar = Calendar.current
+        guard let startDate = calendar.date(byAdding: .day, value: -6, to: calendar.startOfDay(for: Date())),
+              let endDate = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: Date())) else { return }
+        
+        let descriptor = FetchDescriptor<DailyLog>(
+            predicate: #Predicate { $0.date >= startDate && $0.date < endDate }
+        )
+        
+        do {
+            let logs = try context.fetch(descriptor)
+            
+            var newMap: [UUID: [String: DailyLog]] = [:]
+            for log in logs {
+                if let routineId = log.routine?.id {
+                    let dateKey = calendar.startOfDay(for: log.date).formatted(date: .numeric, time: .omitted)
+                    var routineMap = newMap[routineId] ?? [:]
+                    routineMap[dateKey] = log
+                    newMap[routineId] = routineMap
+                }
+            }
+            self.last7DaysLogs = newMap
+        } catch {
+            print("Error fetching 7 days logs: \(error)")
+        }
+    }
     
     func fetchMonthLogs(for date: Date) {
         guard let context = modelContext else { return }
