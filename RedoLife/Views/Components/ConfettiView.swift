@@ -1,73 +1,56 @@
 import SwiftUI
 
 struct ConfettiView: View {
-    @State private var particles: [ConfettiParticle] = []
+    @State private var isAnimating = false
     
     var body: some View {
-        TimelineView(.animation) { timeline in
-            Canvas { context, size in
-                for particle in particles {
-                    context.opacity = particle.opacity
-                    context.draw(particle.shape, at: particle.position)
-                }
+        ZStack {
+            ForEach(0..<20, id: \.self) { index in
+                Circle()
+                    .fill(colors[index % colors.count])
+                    .frame(width: 8, height: 8)
+                    .offset(
+                        x: isAnimating ? CGFloat.random(in: -100...100) : 0,
+                        y: isAnimating ? CGFloat.random(in: -150...150) : 0
+                    )
+                    .opacity(isAnimating ? 0 : 1)
+                    .scaleEffect(isAnimating ? 0.5 : 1)
             }
         }
-        .ignoresSafeArea()
-        .onReceive(NotificationCenter.default.publisher(for: .didCompleteTask)) { notification in
-            if let point = notification.object as? CGPoint {
-                emit(at: point)
-            } else {
-                // Fallback center
-                emit(at: CGPoint(x: 400, y: 300))
+        .onAppear {
+            withAnimation(.easeOut(duration: 1.5)) {
+                isAnimating = true
             }
         }
     }
     
-    func emit(at center: CGPoint) {
-        // Implementation note: Fully separate Physics loop is overkill for simple confetti.
-        // For MVP, we'll keep it simple or just rely on the effect being triggered.
-        // A better approach for SwiftUI is simply using a specialized package, but we must be dependency-free.
-        // So we will just show a subtle flash/overlay for now to "Sparkle".
+    private var colors: [Color] {
+        [AppColors.forest, AppColors.sage, AppColors.tan]
     }
 }
 
-// Simplified Sparkle Effect
-struct SparkleEffect: ViewModifier {
+struct SparkleEffect: View {
     @State private var isSparkling = false
     
-    func body(content: Content) -> some View {
-        content
-            .overlay(
-                ZStack {
-                    if isSparkling {
-                        ForEach(0..<8) { i in
-                            Circle()
-                                .fill(AppColors.warmOrange)
-                                .frame(width: 4, height: 4)
-                                .offset(x: CGFloat.random(in: -20...20), y: CGFloat.random(in: -20...20))
-                                .opacity(isSparkling ? 0 : 1)
-                                .animation(.easeOut(duration: 0.5), value: isSparkling)
-                        }
-                    }
-                }
-            )
-            .onChange(of: isSparkling) { _, newValue in
-                if newValue {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        isSparkling = false
-                    }
+    var body: some View {
+        ZStack {
+            if isSparkling {
+                ForEach(0..<8) { i in
+                    Circle()
+                        .fill(AppColors.tan)
+                        .frame(width: 4, height: 4)
+                        .offset(x: CGFloat.random(in: -20...20), y: CGFloat.random(in: -20...20))
+                        .opacity(isSparkling ? 0 : 1)
+                        .animation(.easeOut(duration: 0.6).delay(Double(i) * 0.05), value: isSparkling)
                 }
             }
+        }
+        .onAppear {
+            isSparkling = true
+        }
     }
 }
 
-extension Notification.Name {
-    static let didCompleteTask = Notification.Name("didCompleteTask")
-}
-
-struct ConfettiParticle {
-    var position: CGPoint
-    var velocity: CGPoint
-    var opacity: Double
-    var shape: Image
+#Preview {
+    ConfettiView()
 }

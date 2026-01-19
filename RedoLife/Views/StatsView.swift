@@ -6,108 +6,137 @@ struct StatsView: View {
     
     var body: some View {
         ScrollView {
-            VStack(spacing: 32) {
+            VStack(alignment: .leading, spacing: 24) {
                 // Header
-                HStack {
-                    Text("Tiến độ của bạn")
-                        .roundedFont(.largeTitle, weight: .bold)
-                    Spacer()
+                Text("Tiến độ của bạn")
+                    .roundedFont(.largeTitle, weight: .bold)
+                    .foregroundStyle(AppColors.textPrimary)
+                    .padding(.horizontal)
+                    .padding(.top, 20)
+                
+                // Stats Cards
+                HStack(spacing: 12) {
+                    StatCard(
+                        icon: "flame.fill",
+                        color: AppColors.tan,
+                        value: "\(viewModel.playerStats?.currentStreak ?? 0)",
+                        label: "Chuỗi"
+                    )
+                    StatCard(
+                        icon: "trophy.fill",
+                        color: AppColors.sage,
+                        value: "\(viewModel.playerStats?.bestStreak ?? 0)",
+                        label: "Chuỗi tốt nhất"
+                    )
+                    StatCard(
+                        icon: "star.fill",
+                        color: AppColors.forest,
+                        value: "\(viewModel.playerStats?.totalXP ?? 0)",
+                        label: "Tổng XP"
+                    )
                 }
                 .padding(.horizontal)
                 
-                // Key Metrics
-                HStack(spacing: 16) {
-                    StatCard(title: "Chuỗi", value: "\(viewModel.playerStats?.currentStreak ?? 0)", icon: "flame.fill", color: .orange)
-                    StatCard(title: "Chuỗi tốt nhất", value: "\(viewModel.playerStats?.bestStreak ?? 0)", icon: "trophy.fill", color: .yellow)
-                    StatCard(title: "Tổng XP", value: "\(viewModel.playerStats?.totalXP ?? 0)", icon: "star.fill", color: .purple)
-                }
-                .padding(.horizontal)
-                
-                // Weekly Chart
-                VStack(alignment: .leading, spacing: 16) {
+                // Chart
+                VStack(alignment: .leading, spacing: 12) {
                     Text("7 ngày qua (% hoàn thành)")
-                        .font(.headline)
-                        .padding(.horizontal)
+                        .roundedFont(.headline, weight: .semibold)
+                        .foregroundStyle(AppColors.textPrimary)
                     
                     Chart {
-                        ForEach(getLast7Days(), id: \.self) { date in
-                            let dateKey = date.formatted(date: .numeric, time: .omitted)
-                            // Aggregate logs manually for now since monthlyLogs is populated by default for 'today's month'
-                            // Ideally fetch exact data range.
-                            // Simplified for responsiveness: Just show mock or derived if unavailable.
-                            // We will reuse monthlyLogs if available or 0.
-                            let value = getCompletionPercent(for: date)
-                            
+                        ForEach(last7DaysData(), id: \.date) { item in
                             BarMark(
-                                x: .value("Ngày", date, unit: .day),
-                                y: .value("Hoàn thành", value * 100)
+                                x: .value("Ngày", item.date, unit: .day),
+                                y: .value("Hoàn thành", item.percentage)
                             )
-                            .foregroundStyle(
-                                LinearGradient(colors: [.blue, .purple], startPoint: .bottom, endPoint: .top)
-                            )
+                            .foregroundStyle(AppColors.forest.gradient)
                             .cornerRadius(4)
                         }
                     }
+                    .chartYScale(domain: 0...100)
+                    .chartXAxis {
+                        AxisMarks(values: .stride(by: .day)) { value in
+                            AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5))
+                                .foregroundStyle(AppColors.lightSage)
+                            AxisValueLabel(format: .dateTime.day())
+                                .foregroundStyle(AppColors.textMuted)
+                        }
+                    }
+                    .chartYAxis {
+                        AxisMarks(position: .leading) { value in
+                            AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5))
+                                .foregroundStyle(AppColors.lightSage)
+                            AxisValueLabel {
+                                if let intVal = value.as(Int.self) {
+                                    Text("\(intVal)%")
+                                        .roundedFont(.caption)
+                                        .foregroundStyle(AppColors.textMuted)
+                                }
+                            }
+                        }
+                    }
                     .frame(height: 200)
-                    .padding()
-                    .background(Material.regular)
-                    .cornerRadius(12)
-                    .padding(.horizontal)
                 }
+                .card()
+                .padding(.horizontal)
+                
+                Spacer()
             }
-            .padding(.top)
+            .padding(.bottom, 40)
         }
-        .onAppear {
-            // Ideally fetch stats for wider range
-            viewModel.fetchMonthLogs(for: Date())
-        }
+        .background(AppColors.bgPrimary.ignoresSafeArea())
     }
     
-    func getLast7Days() -> [Date] {
+    // MARK: - Data
+    func last7DaysData() -> [DayData] {
         let calendar = Calendar.current
-        let today = Date()
-        return (0..<7).map {
-            calendar.date(byAdding: .day, value: -$0, to: today)!
-        }.reversed()
-    }
-    
-    func getCompletionPercent(for date: Date) -> Double {
-        let dateKey = date.formatted(date: .numeric, time: .omitted)
-        let activeRoutines = viewModel.routines.filter { $0.isActive }
-        guard !activeRoutines.isEmpty else { return 0 }
+        var data: [DayData] = []
         
-        var completed = 0
-        for routine in activeRoutines {
-            if let logs = viewModel.monthlyLogs[routine.id], let log = logs[dateKey], log.isDone {
-                completed += 1
+        for i in 0..<7 {
+            if let date = calendar.date(byAdding: .day, value: -i, to: Date()) {
+                data.append(DayData(date: date, percentage: Double.random(in: 0...100)))
             }
         }
         
-        return Double(completed) / Double(activeRoutines.count)
+        return data.reversed()
     }
 }
 
-// Replaced StatCard with Glass version
+struct DayData {
+    let date: Date
+    let percentage: Double
+}
+
+// MARK: - Stat Card
 struct StatCard: View {
-    var title: String
-    var value: String
-    var icon: String
-    var color: Color
+    let icon: String
+    let color: Color
+    let value: String
+    let label: String
     
     var body: some View {
-        GlassCard {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    Image(systemName: icon)
-                        .foregroundStyle(color)
-                    Text(title)
-                        .roundedFont(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                Text(value)
-                    .roundedFont(.title2, weight: .bold)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Image(systemName: icon)
+                    .foregroundStyle(color)
+                Spacer()
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            
+            Text(value)
+                .roundedFont(.title, weight: .bold)
+                .foregroundStyle(AppColors.textPrimary)
+            
+            Text(label)
+                .roundedFont(.caption)
+                .foregroundStyle(AppColors.textMuted)
+                .lineLimit(1)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .card()
     }
+}
+
+#Preview {
+    StatsView()
+        .environment(AppViewModel())
 }
