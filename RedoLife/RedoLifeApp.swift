@@ -1,6 +1,6 @@
 //
-//  La_m_la_i_cuo__c__o__iApp.swift
-//  Làm lại cuộc đời
+//  FixMyLifeApp.swift
+//  FixMyLife
 //
 //  Created by Khoa Nguyễn on 19/01/2026.
 //
@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 @main
-struct RedoLifeApp: App {
+struct FixMyLifeApp: App {
     let dataManager = DataManager.shared
     @State private var appViewModel = AppViewModel()
     @Environment(\.scenePhase) private var scenePhase
@@ -22,11 +22,7 @@ struct RedoLifeApp: App {
         }
         .modelContainer(dataManager.modelContainer)
         
-        MenuBarExtra("Làm lại cuộc đời", systemImage: "flame.fill") {
-            MenuBarView()
-                .environment(appViewModel)
-        }
-        .menuBarExtraStyle(.window)
+
         .onChange(of: scenePhase) { _, newPhase in
              if newPhase == .active {
                  // Refresh logical day if needed

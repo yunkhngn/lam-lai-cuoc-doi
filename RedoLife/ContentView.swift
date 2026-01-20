@@ -79,6 +79,8 @@ struct ContentView: View {
                         GoalsView()
                     case .stats:
                         StatsView()
+                    case .achievements:
+                        AchievementsView()
                     case .settings:
                         SettingsView()
                     }
@@ -184,7 +186,7 @@ struct IconButton: View {
 
 // MARK: - Tab
 enum Tab: CaseIterable, Hashable {
-    case dashboard, calendar, goals, stats, settings
+    case dashboard, calendar, goals, stats, achievements, settings
     
     var icon: String {
         switch self {
@@ -192,6 +194,7 @@ enum Tab: CaseIterable, Hashable {
         case .calendar: return "calendar"
         case .goals: return "target"
         case .stats: return "chart.bar.fill"
+        case .achievements: return "trophy.fill"
         case .settings: return "gearshape"
         }
     }

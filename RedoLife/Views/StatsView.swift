@@ -65,6 +65,8 @@ struct StatsView: View {
                 }
                 .card()
                 
+                // Mood Trend (Removed)
+                
                 // Top Routines
                 VStack(alignment: .leading, spacing: 16) {
                     Text("Top thói quen")
@@ -275,12 +277,14 @@ struct ActivityHeatmap: View {
 
 func getPieColor(index: Int) -> Color {
     let colors = [
-        AppColors.green,
-        Color(hex: "34C759"), // Lighter Green
-        Color(hex: "FF9500"), // Orange
-        Color(hex: "AF52DE"), // Purple
-        Color(hex: "FF2D55"), // Pink
-        Color(hex: "5856D6")  // Indigo
+        Color(hex: "FFB3BA"), // Pastel Pink
+        Color(hex: "BAFFC9"), // Pastel Mint
+        Color(hex: "BAE1FF"), // Pastel Blue
+        Color(hex: "FFDFD3"), // Pastel Peach
+        Color(hex: "E0BBE4"), // Pastel Purple
+        Color(hex: "FFFFBA"), // Pastel Yellow
+        Color(hex: "D291BC"), // Pastel Mauve
+        Color(hex: "957DAD")  // Pastel Violet
     ]
     return colors[index % colors.count]
 }

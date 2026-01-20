@@ -17,6 +17,7 @@ struct DashboardView: View {
     @AppStorage("userName") private var userName: String = ""
     
     @State private var animatedProgress: Double = 0
+
     
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -147,6 +148,12 @@ struct DashboardView: View {
                 }
                 .frame(height: 280)
                 .card(padding: 0)
+                
+                .frame(height: 280)
+                .card(padding: 0)
+                
+                // Mood Tracker (Removed)
+
                 
                 // Today's Routines
                 VStack(alignment: .leading, spacing: 16) {

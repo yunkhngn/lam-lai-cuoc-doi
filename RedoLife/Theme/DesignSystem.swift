@@ -11,6 +11,7 @@ struct AppColors {
     // Accent
     static let accent = Color(hex: "007AFF")
     static let green = Color(hex: "34C759")
+    static let blue = Color(hex: "007AFF")
     
     // Semantic
     static let bgPrimary = lightGray

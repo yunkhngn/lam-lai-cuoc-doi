@@ -25,6 +25,9 @@ class AppViewModel {
     
     var playerStats: PlayerStats?
     
+    // Mood
+
+    
     init() {
         // Context will be set from View
     }
@@ -78,6 +81,11 @@ class AppViewModel {
             
             // Fetch logs for logical today
             refreshDailyLogs()
+            
+
+            
+            // Make sure Chart Data is up to date
+            fetchLast7DaysLogs()
             
         } catch {
             print("Error fetching data: \(error)")
@@ -218,6 +226,34 @@ class AppViewModel {
         
         // Calculate level (every 100 XP = 1 level)
         stats.level = stats.totalXP / 100
+        
+        // Check Notification Condition (Low Progress Reminder)
+        checkProgressReminders(percentage: percentage)
+        
+        // Check Achievements
+        if let context = modelContext {
+            // Check On Fire (Streak)
+            _ = AchievementManager.shared.checkUnlock(type: .onFire, context: context, stats: stats)
+            
+            // Check Early Bird/Weekend Warrior would require more complex log analysis
+            // For simplicity, let's just trigger streak check here
+        }
+    }
+    
+    func checkProgressReminders(percentage: Double) {
+        if percentage >= 0.3 {
+            // Good progress -> Cancel annoying reminders
+            NotificationManager.shared.cancelLowProgressReminders()
+        } else {
+            // Low progress -> Ensure reminders are active
+            // Note: This might be redundant if already scheduled, but safe to ensuring consistency
+            // However, we avoid spamming re-schedule on every toggle if < 30%.
+            // Strategy: We rely on "Cancellation" being the main action. 
+            // Re-scheduling only happens on App Launch or if we want strict enforcement.
+            // For now, let's keep it simple: Cancel if >= 30%.
+            // If user unchecks items and drops below 30%, we could re-enable.
+            NotificationManager.shared.scheduleLowProgressReminders()
+        }
     }
     
     // MARK: - Calendar Support
@@ -228,6 +264,7 @@ class AppViewModel {
     var last7DaysLogs: [UUID: [String: DailyLog]] = [:] // For StatsView
     var last90DaysLogs: [Date: [DailyLog]] = [:] // Map Date -> Logs for that day
     var routineStats: [UUID: (name: String, icon: String, completionCount: Int)] = [:]
+
     
     func fetchActivityData() {
         guard let context = modelContext else { return }
@@ -236,6 +273,9 @@ class AppViewModel {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
         guard let startDate = calendar.date(byAdding: .day, value: -364, to: today) else { return }
+        
+        // ... (Heatmap logic unchanged implies rest of function remains, but I need to be careful with replace)
+        // I will replace fetchActivityData and helpers to be safe and clean.
         
         let descriptor = FetchDescriptor<DailyLog>(
             predicate: #Predicate { $0.date >= startDate }
@@ -246,17 +286,13 @@ class AppViewModel {
             
             // Organize for Heatmap: Date -> [Logs]
             var map: [Date: [DailyLog]] = [:]
-            
-            // Stats counting
             var rStats: [UUID: Int] = [:]
             
             for log in logs {
-                // For Heatmap
                 if log.isDone {
                     let dateKey = calendar.startOfDay(for: log.date)
                     map[dateKey, default: []].append(log)
                     
-                    // For Routine Stats
                     if let rId = log.routine?.id {
                         rStats[rId, default: 0] += 1
                     }
@@ -271,7 +307,7 @@ class AppViewModel {
             }
             self.routineStats = finalStats
             
-            // 3. Update 7 days logs as well
+            // 3. Update 7 days logs
             fetchLast7DaysLogs()
             
         } catch {
@@ -283,16 +319,17 @@ class AppViewModel {
         guard let context = modelContext else { return }
         
         let calendar = Calendar.current
-        guard let startDate = calendar.date(byAdding: .day, value: -6, to: calendar.startOfDay(for: Date())),
-              let endDate = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: Date())) else { return }
+        let today = calendar.startOfDay(for: Date())
+        guard let startDate = calendar.date(byAdding: .day, value: -6, to: today),
+              let endDate = calendar.date(byAdding: .day, value: 1, to: today) else { return }
         
+        // Routines Logs
         let descriptor = FetchDescriptor<DailyLog>(
             predicate: #Predicate { $0.date >= startDate && $0.date < endDate }
         )
         
         do {
             let logs = try context.fetch(descriptor)
-            
             var newMap: [UUID: [String: DailyLog]] = [:]
             for log in logs {
                 if let routineId = log.routine?.id {
@@ -303,11 +340,23 @@ class AppViewModel {
                 }
             }
             self.last7DaysLogs = newMap
+            
+
+            
         } catch {
             print("Error fetching 7 days logs: \(error)")
         }
     }
     
+    // ... (fetchMonthLogs matches original line 359)
+    
+    // ... (toggleGlobalRoutine matches original line 390)
+    
+    // MARK: - Mood Logic
+    
+
+    
+
     func fetchMonthLogs(for date: Date) {
         guard let context = modelContext else { return }
         
@@ -371,4 +420,10 @@ class AppViewModel {
         
         updateStats() // Note: Stats update needs to be smarter to not double count
     }
+    
+
+    
+
+    
+
 }

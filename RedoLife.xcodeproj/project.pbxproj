@@ -23,8 +23,23 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		288C1E9C2F1DDA910069FF4F /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		28A2EE9E2F1DAB83005109A6 /* RedoLife.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RedoLife.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		288C1E872F1DDA900069FF4F /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		288C1E892F1DDA900069FF4F /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		28A2EE9E2F1DAB83005109A6 /* Fix My Life.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Fix My Life.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		28A2EEAD2F1DAB84005109A6 /* RedoLifeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RedoLifeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		28A2EEB72F1DAB84005109A6 /* RedoLifeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RedoLifeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -97,12 +112,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		288C1E862F1DDA900069FF4F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				288C1E872F1DDA900069FF4F /* WidgetKit.framework */,
+				288C1E892F1DDA900069FF4F /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		28A2EE952F1DAB83005109A6 = {
 			isa = PBXGroup;
 			children = (
 				28A2EEA02F1DAB83005109A6 /* RedoLife */,
 				28A2EEB02F1DAB84005109A6 /* RedoLifeTests */,
 				28A2EEBA2F1DAB84005109A6 /* RedoLifeUITests */,
+				288C1E862F1DDA900069FF4F /* Frameworks */,
 				28A2EE9F2F1DAB83005109A6 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -110,7 +135,7 @@
 		28A2EE9F2F1DAB83005109A6 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				28A2EE9E2F1DAB83005109A6 /* RedoLife.app */,
+				28A2EE9E2F1DAB83005109A6 /* Fix My Life.app */,
 				28A2EEAD2F1DAB84005109A6 /* RedoLifeTests.xctest */,
 				28A2EEB72F1DAB84005109A6 /* RedoLifeUITests.xctest */,
 			);
@@ -120,13 +145,14 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		28A2EE9D2F1DAB83005109A6 /* RedoLife */ = {
+		28A2EE9D2F1DAB83005109A6 /* Fix My Life */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 28A2EEC12F1DAB84005109A6 /* Build configuration list for PBXNativeTarget "RedoLife" */;
+			buildConfigurationList = 28A2EEC12F1DAB84005109A6 /* Build configuration list for PBXNativeTarget "Fix My Life" */;
 			buildPhases = (
 				28A2EE9A2F1DAB83005109A6 /* Sources */,
 				28A2EE9B2F1DAB83005109A6 /* Frameworks */,
 				28A2EE9C2F1DAB83005109A6 /* Resources */,
+				288C1E9C2F1DDA910069FF4F /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
@@ -135,11 +161,11 @@
 			fileSystemSynchronizedGroups = (
 				28A2EEA02F1DAB83005109A6 /* RedoLife */,
 			);
-			name = RedoLife;
+			name = "Fix My Life";
 			packageProductDependencies = (
 			);
 			productName = RedoLife;
-			productReference = 28A2EE9E2F1DAB83005109A6 /* RedoLife.app */;
+			productReference = 28A2EE9E2F1DAB83005109A6 /* Fix My Life.app */;
 			productType = "com.apple.product-type.application";
 		};
 		28A2EEAC2F1DAB84005109A6 /* RedoLifeTests */ = {
@@ -225,7 +251,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				28A2EE9D2F1DAB83005109A6 /* RedoLife */,
+				28A2EE9D2F1DAB83005109A6 /* Fix My Life */,
 				28A2EEAC2F1DAB84005109A6 /* RedoLifeTests */,
 				28A2EEB62F1DAB84005109A6 /* RedoLifeUITests */,
 			);
@@ -283,12 +309,12 @@
 /* Begin PBXTargetDependency section */
 		28A2EEAF2F1DAB84005109A6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 28A2EE9D2F1DAB83005109A6 /* RedoLife */;
+			target = 28A2EE9D2F1DAB83005109A6 /* Fix My Life */;
 			targetProxy = 28A2EEAE2F1DAB84005109A6 /* PBXContainerItemProxy */;
 		};
 		28A2EEB92F1DAB84005109A6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 28A2EE9D2F1DAB83005109A6 /* RedoLife */;
+			target = 28A2EE9D2F1DAB83005109A6 /* Fix My Life */;
 			targetProxy = 28A2EEB82F1DAB84005109A6 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -418,9 +444,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_ENTITLEMENTS = RedoLife/RedoLife.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
@@ -435,6 +465,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = yunkhngn.RedoLife;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -451,9 +482,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_ENTITLEMENTS = RedoLife/RedoLife.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
@@ -468,6 +503,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = yunkhngn.RedoLife;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -566,7 +602,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		28A2EEC12F1DAB84005109A6 /* Build configuration list for PBXNativeTarget "RedoLife" */ = {
+		28A2EEC12F1DAB84005109A6 /* Build configuration list for PBXNativeTarget "Fix My Life" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				28A2EEC22F1DAB84005109A6 /* Debug */,

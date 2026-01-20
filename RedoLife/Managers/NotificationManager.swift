@@ -69,6 +69,9 @@ class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
         
         // 3. Motivational quotes
         scheduleHourlyQuotes(interval: quoteInterval)
+        
+        // 4. Low Progress Checks (Default ON, cancelled dynamically)
+        scheduleLowProgressReminders()
     }
     
     func scheduleHourlyQuotes(interval: Int) {
@@ -83,12 +86,37 @@ class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
             
             scheduleNotification(
                 identifier: "quote_\(hour)",
-                title: "💭 Nhắc nhẹ",
+                title: "💭 Một chút động lực",
                 body: quote,
                 hour: hour,
                 minute: 0
             )
         }
+    }
+    
+    // MARK: - Conditional Progress Reminders
+    
+    func scheduleLowProgressReminders() {
+        // Checkpoints: 9h, 12h, 15h, 18h, 21h
+        let checkpoints = [9, 12, 15, 18, 21]
+        
+        for hour in checkpoints {
+            scheduleNotification(
+                identifier: "low_progress_\(hour)",
+                title: "🔔 Nhắc nhở tiến độ",
+                body: "Bạn chưa hoàn thành 30% mục tiêu hôm nay. Cố lên nhé! 💪",
+                hour: hour,
+                minute: 0
+            )
+        }
+    }
+    
+    func cancelLowProgressReminders() {
+        let center = UNUserNotificationCenter.current()
+        let checkpoints = [9, 12, 15, 18, 21]
+        let identifiers = checkpoints.map { "low_progress_\($0)" }
+        center.removePendingNotificationRequests(withIdentifiers: identifiers)
+        // print("Cancelled low progress reminders")
     }
     
     func cancelAllNotifications() {

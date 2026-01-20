@@ -211,7 +211,7 @@ struct SettingsView: View {
             }
             
             // App Info
-            Text("Làm lại cuộc đời v1.0 | Developed by @yun.khngn")
+            Text("FixMyLife v1.0 | Developed by @yun.khngn")
                 .font(.system(size: 13))
                 .foregroundStyle(AppColors.textMuted)
                 .frame(maxWidth: .infinity)
