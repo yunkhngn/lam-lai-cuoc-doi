@@ -216,6 +216,67 @@ struct SettingsView: View {
                 .foregroundStyle(AppColors.textMuted)
                 .frame(maxWidth: .infinity)
                 .padding(.bottom, 20)
+            
+            // Dev Tools (Temporary)
+            if true {
+                VStack(spacing: 12) {
+                    Text("Developer Tools")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(AppColors.textMuted)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    HStack {
+                        Button {
+                            viewModel.injectSampleData()
+                        } label: {
+                            HStack {
+                                Image(systemName: "hammer.fill")
+                                Text("Inject")
+                            }
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundStyle(.white)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 12)
+                            .background(Color.orange)
+                            .cornerRadius(8)
+                        }
+                        
+                        Button {
+                            viewModel.deleteSampleData()
+                        } label: {
+                            HStack {
+                                Image(systemName: "trash.fill")
+                                Text("Clean")
+                            }
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundStyle(.white)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 12)
+                            .background(Color.red)
+                            .cornerRadius(8)
+                        }
+                        
+                        Button {
+                            viewModel.exportData()
+                        } label: {
+                            HStack {
+                                Image(systemName: "square.and.arrow.up")
+                                Text("Backup")
+                            }
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundStyle(.white)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 12)
+                            .background(Color.blue)
+                            .cornerRadius(8)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(16)
+                .background(Color.orange.opacity(0.1))
+                .cornerRadius(12)
+            }
         }
         .padding(.horizontal, 40)
         }

@@ -53,25 +53,10 @@ struct CalendarView: View {
                 
                 // Calendar Grid
                 let days = generateCalendarDays()
-                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 12) {
+                // Use spacing: 0 for columns to allow connecting lines
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 0), count: 7), spacing: 12) {
                     ForEach(days.indices, id: \.self) { index in
-                        let day = days[index]
-                        
-                        if let date = day {
-                            DayCell(
-                                date: date,
-                                completionPercentage: getCompletionForDate(date),
-                                isToday: Calendar.current.isDateInToday(date),
-                                isSelected: selectedDate != nil && Calendar.current.isDate(date, inSameDayAs: selectedDate!)
-                            ) {
-                                withAnimation(.spring(response: 0.3)) {
-                                    selectedDate = date
-                                }
-                            }
-                        } else {
-                            Color.clear
-                                .frame(width: 36, height: 36)
-                        }
+                        cellForDay(at: index, days: days)
                     }
                 }
                 
@@ -242,47 +227,104 @@ struct CalendarView: View {
             selectedDate = nil
         }
     }
+    
+    @ViewBuilder
+    func cellForDay(at index: Int, days: [Date?]) -> some View {
+        if let date = days[index] {
+            let completion = getCompletionForDate(date)
+            let isCompleted = completion >= 1.0
+            
+            // Use closures to compute boolean state to avoid imperative 'if' statements in ViewBuilder
+            let connectLeft: Bool = {
+                guard index > 0, let prevDate = days[index - 1] else { return false }
+                let prevCompletion = getCompletionForDate(prevDate)
+                return isCompleted && prevCompletion >= 1.0 && (index % 7 != 0)
+            }()
+            
+            let connectRight: Bool = {
+                guard index < days.count - 1, let nextDate = days[index + 1] else { return false }
+                let nextCompletion = getCompletionForDate(nextDate)
+                return isCompleted && nextCompletion >= 1.0 && ((index + 1) % 7 != 0)
+            }()
+            
+            DayCell(
+                date: date,
+                completionPercentage: completion,
+                isToday: Calendar.current.isDateInToday(date),
+                isSelected: selectedDate != nil && Calendar.current.isDate(date, inSameDayAs: selectedDate!),
+                connectLeft: connectLeft,
+                connectRight: connectRight
+            ) {
+                withAnimation(.spring(response: 0.3)) {
+                    selectedDate = date
+                }
+            }
+        } else {
+            Color.clear
+                .frame(width: 36, height: 36)
+        }
+    }
 }
 
-// MARK: - Day Cell
+// MARK: - DayCell
 struct DayCell: View {
     let date: Date
     let completionPercentage: Double
     let isToday: Bool
     let isSelected: Bool
+    var connectLeft: Bool = false
+    var connectRight: Bool = false
     let onTap: () -> Void
+    
+    var isInStreak: Bool { completionPercentage >= 1.0 }
     
     var body: some View {
         let dayNum = Calendar.current.component(.day, from: date)
         
         Button(action: onTap) {
-            VStack(spacing: 4) {
-                Text("\(dayNum)")
-                    .font(.system(size: 15, weight: isToday ? .semibold : .regular))
-                    .foregroundStyle(isToday ? .white : (isSelected ? AppColors.green : AppColors.textPrimary))
-                    .frame(width: 32, height: 32)
-                    .background(
-                        Circle()
-                            .fill(isToday ? AppColors.green : (isSelected ? AppColors.green.opacity(0.1) : Color.clear))
-                    )
-                
-                // Completion indicator dot
-                Circle()
-                    .fill(dotColor)
-                    .frame(width: 6, height: 6)
-                    .opacity(completionPercentage > 0 ? 1 : 0.3)
-            }
+            Text("\(dayNum)")
+                .font(.system(size: 15, weight: isInStreak || isToday ? .semibold : .regular))
+                .foregroundStyle(textColor)
+                .frame(maxWidth: .infinity)
+                .frame(height: 40)
+                .background(backgroundShape)
         }
         .buttonStyle(.plain)
     }
     
-    var dotColor: Color {
-        if completionPercentage >= 1.0 {
+    @ViewBuilder
+    var backgroundShape: some View {
+        if isInStreak {
+            // Duolingo-style capsule: rounded edges only at streak start/end
+            UnevenRoundedRectangle(
+                topLeadingRadius: connectLeft ? 0 : 20,
+                bottomLeadingRadius: connectLeft ? 0 : 20,
+                topTrailingRadius: connectRight ? 0 : 20,
+                bottomTrailingRadius: connectRight ? 0 : 20
+            )
+            .fill(Color.orange)
+        } else if isToday {
+            Circle()
+                .fill(AppColors.green)
+                .frame(width: 36, height: 36)
+        } else if isSelected {
+            Circle()
+                .stroke(AppColors.green, lineWidth: 2)
+                .frame(width: 36, height: 36)
+        } else {
+            Color.clear
+        }
+    }
+    
+    var textColor: Color {
+        if isInStreak || isToday {
+            return .white
+        } else if isSelected {
             return AppColors.green
         } else if completionPercentage > 0 {
-            return AppColors.green.opacity(0.6)
+            return AppColors.textPrimary
         } else {
-            return AppColors.lightGray
+            return AppColors.textMuted
         }
     }
 }

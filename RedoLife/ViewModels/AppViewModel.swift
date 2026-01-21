@@ -114,10 +114,14 @@ class AppViewModel {
         
         do {
             self.dailyLogs = try context.fetch(logsDescriptor)
-            self.todayLogs = Dictionary(uniqueKeysWithValues: dailyLogs.compactMap { log in
-                guard let routine = log.routine else { return nil }
-                return (routine.id, log)
-            })
+            
+            // Build dictionary manually to handle duplicates (last one wins)
+            var logsMap: [UUID: DailyLog] = [:]
+            for log in dailyLogs {
+                guard let routine = log.routine else { continue }
+                logsMap[routine.id] = log // Overwrites if duplicate
+            }
+            self.todayLogs = logsMap
         } catch {
             print("Error fetching logs: \(error)")
         }
@@ -461,4 +465,213 @@ class AppViewModel {
 
     
 
+    // MARK: - Dev Tools
+    // MARK: - Safe Dev Tools
+    func exportData() {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        encoder.dateEncodingStrategy = .iso8601
+        
+        // Map database models to DTOs
+        let routineDTOs = routines.map { routine in
+            RoutineBackup(
+                id: routine.id,
+                name: routine.name,
+                icon: routine.icon,
+                isActive: routine.isActive,
+                order: routine.order,
+                createdAt: routine.createdAt,
+                archivedAt: routine.archivedAt
+            )
+        }
+        
+        let goalDTOs = goals.map { goal in
+            GoalBackup(
+                id: goal.id,
+                name: goal.name,
+                icon: goal.icon,
+                isCompleted: goal.isCompleted,
+                completedDate: goal.completedDate,
+                deadline: goal.deadline,
+                isLongTerm: goal.isLongTerm,
+                createdAt: goal.createdAt,
+                order: goal.order,
+                isActive: goal.isActive,
+                archivedAt: goal.archivedAt
+            )
+        }
+        
+        do {
+            let backup = BackupData(routines: routineDTOs, goals: goalDTOs)
+            let data = try encoder.encode(backup)
+            
+            let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("redo_life_backup.json")
+            try data.write(to: url)
+            print("Backup saved to: \(url.path)")
+        } catch {
+            print("Backup failed: \(error)")
+        }
+    }
+    
+    struct BackupData: Codable {
+        let routines: [RoutineBackup]
+        let goals: [GoalBackup]
+    }
+    
+    struct RoutineBackup: Codable {
+        let id: UUID
+        let name: String
+        let icon: String
+        let isActive: Bool
+        let order: Int
+        let createdAt: Date
+        let archivedAt: Date?
+    }
+    
+    struct GoalBackup: Codable {
+        let id: UUID
+        let name: String
+        let icon: String
+        let isCompleted: Bool
+        let completedDate: Date?
+        let deadline: Date?
+        let isLongTerm: Bool
+        let createdAt: Date
+        let order: Int
+        let isActive: Bool
+        let archivedAt: Date?
+    }
+    
+    // Helper to delete injected data (Prevent mixing dev data with real data permanently)
+    func deleteSampleData() {
+        guard let context = modelContext else { return }
+        
+        let sampleRoutineNames = ["Dậy sớm", "Đọc sách", "Chạy bộ", "Code dạo", "Uống nước", "Thiền"]
+        let sampleGoalNames = ["Đọc 10 cuốn sách", "Tiết kiệm 100tr", "Học AI Agent", "Đi Đà Lạt"]
+        
+        for routine in routines {
+            if sampleRoutineNames.contains(routine.name) {
+                context.delete(routine)
+            }
+        }
+        
+        for goal in goals {
+            if sampleGoalNames.contains(goal.name) {
+                context.delete(goal)
+            }
+        }
+        
+        fetchData()
+        print("Sample data deleted!")
+    }
+    func injectSampleData() {
+        guard let context = modelContext else { return }
+        
+        // Safety: Try to clean previous sample data first to avoid duplicates
+        deleteSampleData() 
+        // Note: deleteSampleData calls fetchData, but we continue...
+        
+        // 1. Create Sample Routines
+        let routineNames = [
+            ("Dậy sớm", "sun.max.fill"),
+            ("Đọc sách", "book.fill"),
+            ("Chạy bộ", "figure.run"),
+            ("Code dạo", "laptopcomputer"),
+            ("Uống nước", "drop.fill"),
+            ("Thiền", "wind")
+        ]
+        
+        var createdRoutines: [Routine] = []
+        
+        for (index, (name, icon)) in routineNames.enumerated() {
+            let routine = Routine(name: name, icon: icon, order: index)
+            context.insert(routine)
+            createdRoutines.append(routine)
+        }
+        
+        // 2. Create Sample Logs (Past 90 days)
+        // CRITICAL: We must fetch ALL routines (including user's existing ones) to ensure 100% completion
+        let routinesDescriptor = FetchDescriptor<Routine>()
+        let allRoutines = (try? context.fetch(routinesDescriptor)) ?? createdRoutines
+        
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        
+        // FIRST: Delete all existing logs for the last 7 days to prevent duplicates
+        if let sevenDaysAgo = calendar.date(byAdding: .day, value: -6, to: today) {
+            let logsToDeleteDescriptor = FetchDescriptor<DailyLog>(
+                predicate: #Predicate { $0.date >= sevenDaysAgo }
+            )
+            if let existingLogs = try? context.fetch(logsToDeleteDescriptor) {
+                for log in existingLogs {
+                    context.delete(log)
+                }
+            }
+        }
+        
+        for i in 0..<90 {
+            guard let date = calendar.date(byAdding: .day, value: -i, to: today) else { continue }
+            
+            // Force perfect streak for the last 7 days (including today)
+            // We must complete EVERY active routine to get 100%
+            if i < 7 {
+                for routine in allRoutines {
+                    // Only log if routine was created before or on this date (simplified: just do it)
+                    // We assume active routines should be done.
+                    if routine.isActive {
+                        let log = DailyLog(date: date, isDone: true, routine: routine)
+                        context.insert(log)
+                    }
+                }
+            } else {
+                // Random history for sample routines only (to avoid messing up user's history too much)
+                for routine in createdRoutines {
+                    if Bool.random() { // 50% chance
+                        let isDone = Double.random(in: 0...1) > 0.3
+                        if isDone {
+                            let log = DailyLog(date: date, isDone: true, routine: routine)
+                            context.insert(log)
+                        }
+                    }
+                }
+            }
+        }
+        
+        // 3. Create Sample Goals
+        let goalNames = [
+            ("Đọc 10 cuốn sách", true),
+            ("Tiết kiệm 100tr", true),
+            ("Học AI Agent", false),
+            ("Đi Đà Lạt", false)
+        ]
+        
+        for (index, (name, isLongTerm)) in goalNames.enumerated() {
+            let goal = Goal(name: name, isLongTerm: isLongTerm, order: index)
+            if index % 2 == 0 { // Make some completed
+                goal.isCompleted = true
+                goal.completedDate = Date().addingTimeInterval(-86400 * Double(index))
+            }
+            context.insert(goal)
+        }
+        
+        // 4. Update Stats and Logs
+        try? context.save() // Ensure save before fetch
+        fetchData()
+        fetchActivityData()
+        fetchMonthLogs(for: currentMonth) // CRITICAL: Refresh Calendar
+        
+        // 5. Force update PlayerStats and Check Achievements
+        if let stats = self.playerStats {
+            stats.currentStreak = 7 // Force streak to match injected data
+            stats.todayXP = 1200 // Arbitrary XP for visual
+            
+            // Trigger achievement check
+            _ = AchievementManager.shared.checkUnlock(type: .onFire, context: context, stats: stats)
+            // Also check Early Bird if applicable (not fully implemented logic yet but good to trigger)
+            _ = AchievementManager.shared.checkUnlock(type: .earlyBird, context: context, stats: stats)
+             _ = AchievementManager.shared.checkUnlock(type: .weekendWarrior, context: context, stats: stats)
+        }
+        
+        print("Sample data injected & Stats updated!")
+    }
 }
