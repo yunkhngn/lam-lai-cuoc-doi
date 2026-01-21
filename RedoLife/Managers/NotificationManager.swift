@@ -133,6 +133,8 @@ class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
     }
     
     // MARK: - Conditional Progress Reminders
+    
+    func cancelLowProgressReminders() {
         let center = UNUserNotificationCenter.current()
         let checkpoints = [9, 12, 15, 18, 21]
         let identifiers = checkpoints.map { "low_progress_\($0)" }

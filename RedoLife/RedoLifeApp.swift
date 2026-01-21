@@ -26,17 +26,11 @@ struct FixMyLifeApp: App {
         .defaultSize(width: 1000, height: 700)
         
         MenuBarExtra("RedoLife", systemImage: "leaf.fill") {
-            Button("Mở ứng dụng") {
-                NSApp.activate(ignoringOtherApps: true)
-                if let window = NSApp.windows.first {
-                    window.makeKeyAndOrderFront(nil)
-                }
-            }
-            Divider()
-            Button("Thoát") {
-                NSApplication.shared.terminate(nil)
-            }
+            MenuBarView()
+                .environment(appViewModel)
+                .modelContainer(dataManager.modelContainer) // Ensure context connects
         }
+        .menuBarExtraStyle(.window)
         .onChange(of: scenePhase) { _, newPhase in
              if newPhase == .active {
                  // Refresh logical day if needed
