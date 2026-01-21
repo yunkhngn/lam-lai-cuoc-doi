@@ -34,9 +34,13 @@ class AchievementManager {
         case .onFire:
             return stats.currentStreak >= 7 // Match the description/icon requirement
         case .earlyBird:
-            return true // Simplified for demo/injection
+            // Proxy: User has accumulated some XP (Active user)
+            // Real implementation requires tracking completion time
+            return stats.totalXP >= 100
         case .weekendWarrior:
-            return true // Simplified for demo/injection
+            // Proxy: User has accumulated significant XP (Long term user)
+            // Real implementation requires calendar analysis
+            return stats.totalXP >= 1000
         }
     }
 }

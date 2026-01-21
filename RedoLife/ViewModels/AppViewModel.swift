@@ -274,8 +274,10 @@ class AppViewModel {
             // Check On Fire (Streak)
             _ = AchievementManager.shared.checkUnlock(type: .onFire, context: context, stats: stats)
             
-            // Check Early Bird/Weekend Warrior would require more complex log analysis
-            // For simplicity, let's just trigger streak check here
+            // Check Early Bird/Weekend Warrior
+            // Note: Currently using simplified logic (always true or proxy) until we track timestamps
+            _ = AchievementManager.shared.checkUnlock(type: .earlyBird, context: context, stats: stats)
+            _ = AchievementManager.shared.checkUnlock(type: .weekendWarrior, context: context, stats: stats)
         }
     }
     
