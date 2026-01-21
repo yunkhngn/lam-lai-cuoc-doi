@@ -79,6 +79,16 @@ class AppViewModel {
             let goalsDescriptor = FetchDescriptor<Goal>(sortBy: [SortDescriptor(\.order)])
             self.goals = try context.fetch(goalsDescriptor)
             
+            // Migration: Fix legacy archived routines
+            // If inactive and archivedAt is nil, set it to now so they show up in history
+            let legacyArchived = self.routines.filter { !$0.isActive && $0.archivedAt == nil }
+            if !legacyArchived.isEmpty {
+                for routine in legacyArchived {
+                    routine.archivedAt = Date()
+                }
+                // Save context will happen on next run logic or implicit
+            }
+            
             // Fetch logs for logical today
             refreshDailyLogs()
             
@@ -160,6 +170,31 @@ class AppViewModel {
         goal.deadline = deadline
         goal.isLongTerm = isLongTerm
         lastUpdate = Date()
+    }
+    
+    func moveRoutine(from source: IndexSet, to destination: Int) {
+        var activeRoutines = routines.filter { $0.isActive }.sorted { $0.order < $1.order }
+        activeRoutines.move(fromOffsets: source, toOffset: destination)
+        
+        // Re-assign order based on new position
+        for (index, routine) in activeRoutines.enumerated() {
+            routine.order = index
+        }
+        
+        // Save Context implicitly handled or triggers fetch if needed
+        // Ideally we update the main `routines` array too or just re-fetch
+        fetchData()
+    }
+    
+    func moveGoal(from source: IndexSet, to destination: Int) {
+        // Similar logic for goals if needed
+        var activeGoals = goals.filter { $0.isActive }.sorted { $0.order < $1.order }
+        activeGoals.move(fromOffsets: source, toOffset: destination)
+        
+        for (index, goal) in activeGoals.enumerated() {
+            goal.order = index
+        }
+        fetchData()
     }
     
     func updateStats() {

@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import UniformTypeIdentifiers
 
 struct GoalsView: View {
     @Environment(AppViewModel.self) var viewModel
@@ -48,19 +49,54 @@ struct GoalsView: View {
                     .padding(.vertical, 40)
                     .card()
                 } else {
-                    VStack(spacing: 0) {
-                        ForEach(viewModel.routines) { routine in
-                            RoutineRow(routine: routine, onDelete: {
-                                deleteRoutine(routine)
-                            })
-                            
-                            if routine.id != viewModel.routines.last?.id {
-                                Divider()
-                                    .background(AppColors.lightGray)
+                    let activeRoutines = viewModel.routines.filter { $0.isActive }
+                    let archivedRoutines = viewModel.routines.filter { !$0.isActive }
+                    
+                    if !activeRoutines.isEmpty {
+                        VStack(spacing: 0) {
+                            ForEach(activeRoutines) { routine in
+                                RoutineRow(routine: routine, onDelete: {
+                                    deleteRoutine(routine)
+                                })
+                                .onDrag {
+                                    return NSItemProvider(object: routine.id.uuidString as NSString)
+                                }
+                                .onDrop(of: [.text], delegate: RoutineDropDelegate(item: routine, viewModel: viewModel))
+                                
+                                if routine.id != activeRoutines.last?.id {
+                                    Divider()
+                                        .background(AppColors.lightGray)
+                                }
                             }
                         }
+                        .card(padding: 0)
                     }
-                    .card(padding: 0)
+                    
+                    // Archived Section
+                    if !archivedRoutines.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Đã lưu trữ")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundStyle(AppColors.textMuted)
+                                .padding(.top, 8)
+                            
+                            VStack(spacing: 0) {
+                                ForEach(archivedRoutines) { routine in
+                                    RoutineRow(routine: routine, onDelete: {
+                                        deleteRoutine(routine)
+                                    })
+                                    
+                                    if routine.id != archivedRoutines.last?.id {
+                                        Divider()
+                                            .background(AppColors.lightGray)
+                                    }
+                                }
+                            }
+                            .card(padding: 0)
+                            .opacity(0.6)
+                        }
+                        .padding(.top, 16)
+                    }
                 }
                 
                 // Goals Section
@@ -87,27 +123,35 @@ struct GoalsView: View {
                 
                 // Goals Progress Bar
                 if !viewModel.goals.isEmpty {
+                    // Calculate progress based on ACTIVE goals only? Or ALL?
+                    // Usually "Progress" implies active tasks. 
+                    // Let's filter for active goals to match the list above.
+                    let activeGoals = viewModel.goals.filter { $0.isActive }
+                    let completedActive = activeGoals.filter { $0.isCompleted }.count
+                    let progress = activeGoals.isEmpty ? 0 : Double(completedActive) / Double(activeGoals.count)
+                    
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
-                            Text("\(viewModel.goals.filter { $0.isCompleted }.count)/\(viewModel.goals.count) hoàn thành")
+                            Text("\(completedActive)/\(activeGoals.count) hoàn thành")
                                 .font(.system(size: 13))
                                 .foregroundStyle(AppColors.textMuted)
                             Spacer()
-                            Text("\(Int(viewModel.goalsProgress * 100))%")
+                            Text("\(Int(progress * 100))%")
                                 .font(.system(size: 13, weight: .semibold))
                                 .foregroundStyle(AppColors.green)
                         }
                         
                         GeometryReader { geo in
                             ZStack(alignment: .leading) {
+                                // Background Track - Ensure distinct color
                                 RoundedRectangle(cornerRadius: 4)
-                                    .fill(AppColors.lightGray)
+                                    .fill(Color.gray.opacity(0.2)) // Slightly darker for visibility
                                     .frame(height: 8)
                                 
                                 RoundedRectangle(cornerRadius: 4)
                                     .fill(AppColors.green.gradient)
-                                    .frame(width: geo.size.width * viewModel.goalsProgress, height: 8)
-                                    .animation(.spring(duration: 0.5), value: viewModel.goalsProgress)
+                                    .frame(width: geo.size.width * progress, height: 8)
+                                    .animation(.spring(duration: 0.5), value: progress)
                             }
                         }
                         .frame(height: 8)
@@ -130,23 +174,58 @@ struct GoalsView: View {
                     .padding(.vertical, 40)
                     .card()
                 } else {
-                    VStack(spacing: 0) {
-                        ForEach(viewModel.goals) { goal in
-                            GoalRow(goal: goal, onToggle: {
-                                viewModel.toggleGoal(goal)
-                            }, onEdit: {
-                                editingGoal = goal
-                            }, onDelete: {
-                                viewModel.deleteGoal(goal)
-                            })
-                            
-                            if goal.id != viewModel.goals.last?.id {
-                                Divider()
-                                    .background(AppColors.lightGray)
+                    let activeGoals = viewModel.goals.filter { $0.isActive }
+                    let archivedGoals = viewModel.goals.filter { !$0.isActive }
+                    
+                    if !activeGoals.isEmpty {
+                        VStack(spacing: 0) {
+                            ForEach(activeGoals) { goal in
+                                GoalRow(goal: goal, onToggle: {
+                                    viewModel.toggleGoal(goal)
+                                }, onEdit: {
+                                    editingGoal = goal
+                                }, onDelete: {
+                                    viewModel.deleteGoal(goal)
+                                })
+                                
+                                if goal.id != activeGoals.last?.id {
+                                    Divider()
+                                        .background(AppColors.lightGray)
+                                }
                             }
                         }
+                        .card(padding: 0)
                     }
-                    .card(padding: 0)
+                    
+                    // Archived Goals Section
+                    if !archivedGoals.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Mục tiêu đã lưu trữ")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundStyle(AppColors.textMuted)
+                                .padding(.top, 8)
+                            
+                            VStack(spacing: 0) {
+                                ForEach(archivedGoals) { goal in
+                                    GoalRow(goal: goal, onToggle: {
+                                        viewModel.toggleGoal(goal)
+                                    }, onEdit: {
+                                        editingGoal = goal
+                                    }, onDelete: {
+                                        viewModel.deleteGoal(goal)
+                                    })
+                                    
+                                    if goal.id != archivedGoals.last?.id {
+                                        Divider()
+                                            .background(AppColors.lightGray)
+                                    }
+                                }
+                            }
+                            .card(padding: 0)
+                            .opacity(0.6)
+                        }
+                        .padding(.top, 16)
+                    }
                 }
                 
                 Spacer().frame(height: 40)
@@ -261,6 +340,26 @@ struct GoalRow: View {
             
             Divider()
             
+            if goal.isActive {
+                Button {
+                    withAnimation {
+                        goal.isActive = false
+                        goal.archivedAt = Date()
+                    }
+                } label: {
+                    Label("Lưu trữ", systemImage: "archivebox")
+                }
+            } else {
+                Button {
+                    withAnimation {
+                        goal.isActive = true
+                        goal.archivedAt = nil
+                    }
+                } label: {
+                    Label("Khôi phục", systemImage: "arrow.uturn.backward")
+                }
+            }
+            
             Button(role: .destructive) {
                 onDelete()
             } label: {
@@ -288,17 +387,33 @@ struct RoutineRow: View {
         ("Trái tim", "heart.fill")
     ]
     
+    func colorForIcon(_ icon: String) -> Color {
+        switch icon {
+        case "star.fill": return .yellow
+        case "flame.fill": return .orange
+        case "book.fill": return .brown
+        case "figure.run": return .blue
+        case "bed.double.fill": return .indigo
+        case "drop.fill": return .cyan
+        case "leaf.fill": return .green
+        case "heart.fill": return .red
+        default: return AppColors.green
+        }
+    }
+    
     var body: some View {
         HStack(spacing: 16) {
             // Icon
+            let iconColor = colorForIcon(routine.icon)
+            
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
-                    .fill(AppColors.green.opacity(0.12))
+                    .fill(iconColor.opacity(0.15))
                     .frame(width: 36, height: 36)
                 
                 Image(systemName: routine.icon)
                     .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(AppColors.green)
+                    .foregroundColor(iconColor)
             }
             
             Text(routine.name)
@@ -327,6 +442,26 @@ struct RoutineRow: View {
             }
             
             Divider()
+            
+            if routine.isActive {
+                Button {
+                    withAnimation {
+                        routine.isActive = false
+                        routine.archivedAt = Date()
+                    }
+                } label: {
+                    Label("Lưu trữ", systemImage: "archivebox")
+                }
+            } else {
+                Button {
+                    withAnimation {
+                        routine.isActive = true
+                        routine.archivedAt = nil
+                    }
+                } label: {
+                    Label("Khôi phục", systemImage: "arrow.uturn.backward")
+                }
+            }
             
             Button(role: .destructive) {
                 onDelete()
@@ -515,6 +650,42 @@ struct EditGoalSheet: View {
     }
 }
 
+struct RoutineDropDelegate: DropDelegate {
+    let item: Routine
+    var viewModel: AppViewModel
+    
+    func performDrop(info: DropInfo) -> Bool {
+        return true
+    }
+    
+    func dropEntered(info: DropInfo) {
+        guard let itemProvider = info.itemProviders(for: [.text]).first else { return }
+        
+        itemProvider.loadObject(ofClass: NSString.self) { string, _ in
+            guard let fromIdString = string as? String,
+                  let fromId = UUID(uuidString: fromIdString) else { return }
+            
+            DispatchQueue.main.async {
+                guard fromId != item.id else { return }
+                
+                // Find indices
+                let activeRoutines = viewModel.routines.filter { $0.isActive }.sorted { $0.order < $1.order }
+                guard let fromIndex = activeRoutines.firstIndex(where: { $0.id == fromId }),
+                      let toIndex = activeRoutines.firstIndex(where: { $0.id == item.id }) else { return }
+                
+                // Move in ViewModel
+                withAnimation {
+                   viewModel.moveRoutine(from: IndexSet(integer: fromIndex), to: toIndex > fromIndex ? toIndex + 1 : toIndex)
+                }
+            }
+        }
+    }
+    
+    func dropUpdated(info: DropInfo) -> DropProposal? {
+        return DropProposal(operation: .move)
+    }
+}
+ 
 #Preview {
     GoalsView()
         .environment(AppViewModel())

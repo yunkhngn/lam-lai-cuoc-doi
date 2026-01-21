@@ -105,30 +105,56 @@ struct CalendarView: View {
                     }
                     
                     let dateKey = Calendar.current.startOfDay(for: date).formatted(date: .numeric, time: .omitted)
-                    let activeRoutines = viewModel.routines.filter { $0.isActive }
+                    let checkDate = Calendar.current.startOfDay(for: date)
                     
-                    if activeRoutines.isEmpty {
+                    // Robust filter: 
+                    // 1. routine.isActive -> Show
+                    // 2. hasLog -> Show (Always show history if data exists)
+                    // 3. !isActive AND archivedAt != nil AND date < startOfDay(archivedAt) -> Show (Show history before it was archived)
+                    let routinesToShow = viewModel.routines.filter { routine in
+                        // Check explicit log existence
+                        if viewModel.monthlyLogs[routine.id]?[dateKey] != nil { return true }
+                        
+                        // If active, show
+                        if routine.isActive { return true }
+                        
+                        // If archived: Check if this date is BEFORE the archive date
+                        if let archivedDate = routine.archivedAt {
+                             let archiveStartDay = Calendar.current.startOfDay(for: archivedDate)
+                             return checkDate < archiveStartDay
+                        }
+                        
+                        return false
+                    }
+                    
+                    if routinesToShow.isEmpty {
                         Text("Chưa có thói quen nào")
                             .foregroundStyle(AppColors.textMuted)
                             .frame(maxWidth: .infinity)
                             .padding()
                     } else {
                         VStack(spacing: 0) {
-                            ForEach(activeRoutines) { routine in
+                            ForEach(routinesToShow, id: \.id) { routine in
                                 let isDone = viewModel.monthlyLogs[routine.id]?[dateKey]?.isDone ?? false
                                 
                                 HStack(spacing: 12) {
                                     Image(systemName: isDone ? "checkmark.circle.fill" : "circle")
-                                        .foregroundStyle(isDone ? AppColors.green : AppColors.mediumGray.opacity(0.4))
+                                        .foregroundStyle(isDone ? AppColors.green : AppColors.mediumGray.opacity(isDone ? 1 : 0.4))
                                     
                                     Text(routine.name)
                                         .foregroundStyle(isDone ? AppColors.textPrimary : AppColors.textMuted)
                                     
                                     Spacer()
+                                    
+                                    if !routine.isActive {
+                                        Image(systemName: "archivebox.fill")
+                                            .font(.system(size: 10))
+                                            .foregroundStyle(AppColors.textMuted.opacity(0.5))
+                                    }
                                 }
                                 .padding(.vertical, 10)
                                 
-                                if routine.id != activeRoutines.last?.id {
+                                if routine.id != routinesToShow.last?.id {
                                     Divider()
                                 }
                             }
@@ -186,18 +212,27 @@ struct CalendarView: View {
     func getCompletionForDate(_ date: Date) -> Double {
         let calendar = Calendar.current
         let dateKey = calendar.startOfDay(for: date).formatted(date: .numeric, time: .omitted)
+        let checkDate = calendar.startOfDay(for: date)
         
-        let activeRoutines = viewModel.routines.filter { $0.isActive }
-        guard !activeRoutines.isEmpty else { return 0 }
+        let validRoutines = viewModel.routines.filter { routine in
+            if viewModel.monthlyLogs[routine.id]?[dateKey] != nil { return true }
+            if routine.isActive { return true }
+            if let archivedDate = routine.archivedAt {
+                 return checkDate < calendar.startOfDay(for: archivedDate)
+            }
+            return false
+        }
+        
+        guard !validRoutines.isEmpty else { return 0 }
         
         var completedCount = 0
-        for routine in activeRoutines {
+        for routine in validRoutines {
             if let log = viewModel.monthlyLogs[routine.id]?[dateKey], log.isDone {
                 completedCount += 1
             }
         }
         
-        return Double(completedCount) / Double(activeRoutines.count)
+        return Double(completedCount) / Double(validRoutines.count)
     }
     
     func changeMonth(by value: Int) {

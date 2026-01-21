@@ -135,11 +135,6 @@ struct StatsView: View {
         var data: [DayData] = []
         
         let activeRoutines = viewModel.routines.filter { $0.isActive }
-        // ... (Logic remains similar but using new data source if we wanted, 
-        // but keeping it simple relying on the specific fetch for now is fine)
-        // Actually let's use the robust fetchLast7DaysLogs logic implicitly called by fetchActivityData
-        
-        // Re-implementing simplified logic for robustness:
         for i in 0..<7 {
             if let date = calendar.date(byAdding: .day, value: -6 + i, to: Date()) {
                 let dateKey = calendar.startOfDay(for: date).formatted(date: .numeric, time: .omitted)
@@ -166,7 +161,6 @@ struct StatsView: View {
 struct ActivityHeatmap: View {
     let logs: [Date: [DailyLog]]
     
-    // Grid Configuration
     let rows = 7 // Mon, Tue, Wed, Thu, Fri, Sat, Sun
     let spacing: CGFloat = 4
     let boxSize: CGFloat = 12
@@ -179,15 +173,12 @@ struct ActivityHeatmap: View {
                         // Calculate weeks
                         let calendar = Calendar.current
                         let today = calendar.startOfDay(for: Date())
-                        // We want 52 weeks (approx 1 year)
-                        // Create a grid of weeks
+                
                         
                         ForEach(0..<53, id: \.self) { weekIndex in
                             VStack(spacing: spacing) {
                                 ForEach(0..<rows, id: \.self) { dayIndex in
-                                    // Calculate date for this cell
-                                    // logic: week 0 is 52 weeks ago.
-                                    // Start date adjustment needed.
+                    
                                     if let date = getDate(weekIndex: weekIndex, dayIndex: dayIndex, today: today) {
                                         if date <= today {
                                             let count = logs[date]?.count ?? 0

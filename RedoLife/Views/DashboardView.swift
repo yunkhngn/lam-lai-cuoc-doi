@@ -162,8 +162,10 @@ struct DashboardView: View {
                         .foregroundStyle(AppColors.textMuted)
                     
                     let activeRoutines = viewModel.routines.filter { $0.isActive }
+                    let archivedRoutines = viewModel.routines.filter { !$0.isActive }
                     
-                    if activeRoutines.isEmpty {
+                    // Active Routines Section
+                    if activeRoutines.isEmpty && archivedRoutines.isEmpty {
                         // Empty State
                         VStack(spacing: 16) {
                             Image(systemName: "leaf.fill")
@@ -183,38 +185,21 @@ struct DashboardView: View {
                         .padding(.vertical, 40)
                         .card(padding: 20)
                     } else {
-                        VStack(spacing: 0) {
-                            ForEach(activeRoutines) { routine in
-                                let isDone = viewModel.todayLogs[routine.id]?.isDone ?? false
-                                
-                                Button {
-                                    withAnimation(.spring(response: 0.3)) {
-                                        viewModel.toggleRoutine(routine)
+                        // Active List
+                        if !activeRoutines.isEmpty {
+                            VStack(spacing: 0) {
+                                    ForEach(activeRoutines) { routine in
+                                    DashboardRoutineRow(routine: routine, viewModel: viewModel)
+                                    
+                                    if routine.id != activeRoutines.last?.id {
+                                        Divider()
+                                            .background(AppColors.lightGray)
                                     }
-                                } label: {
-                                    HStack(spacing: 16) {
-                                        Image(systemName: isDone ? "checkmark.circle.fill" : "circle")
-                                            .font(.system(size: 22))
-                                            .foregroundStyle(isDone ? AppColors.green : AppColors.mediumGray.opacity(0.5))
-                                        
-                                        Text(routine.name)
-                                            .font(.system(size: 16))
-                                            .foregroundStyle(isDone ? AppColors.textMuted : AppColors.textPrimary)
-                                            .strikethrough(isDone, color: AppColors.textMuted)
-                                        
-                                        Spacer()
-                                    }
-                                    .padding(.vertical, 14)
-                                }
-                                .buttonStyle(.plain)
-                                
-                                if routine.id != activeRoutines.last?.id {
-                                    Divider()
-                                        .background(AppColors.lightGray)
                                 }
                             }
+                            .card(padding: 16)
                         }
-                        .card(padding: 16)
+                        
                     }
                 }
             }
@@ -266,6 +251,66 @@ struct DashboardView: View {
     func randomQuote() -> String {
         let dayOfYear = Calendar.current.ordinality(of: .day, in: .year, for: Date()) ?? 1
         return inspirationQuotes[dayOfYear % inspirationQuotes.count]
+    }
+}
+
+private struct DashboardRoutineRow: View {
+    let routine: Routine
+    var viewModel: AppViewModel
+    var isArchived: Bool = false
+    
+    var body: some View {
+        let isDone = viewModel.todayLogs[routine.id]?.isDone ?? false
+        
+        Button {
+            guard !isArchived else { return }
+            withAnimation(.spring(response: 0.3)) {
+                viewModel.toggleRoutine(routine)
+            }
+        } label: {
+            HStack(spacing: 16) {
+                Image(systemName: isDone ? "checkmark.circle.fill" : "circle")
+                    .font(.system(size: 22))
+                    .foregroundStyle(isDone ? AppColors.green : AppColors.mediumGray.opacity(isArchived ? 0.3 : 0.5))
+                
+                Text(routine.name)
+                    .font(.system(size: 16))
+                    .foregroundStyle(isDone || isArchived ? AppColors.textMuted : AppColors.textPrimary)
+                    .strikethrough(isDone, color: AppColors.textMuted)
+                
+                Spacer()
+                
+                if isArchived {
+                    Image(systemName: "archivebox.fill")
+                        .font(.system(size: 12))
+                        .foregroundStyle(AppColors.textMuted)
+                }
+            }
+            .padding(.vertical, 14)
+            .contentShape(Rectangle()) // Better hit testing for context menu
+        }
+        .buttonStyle(.plain)
+        .contextMenu {
+            if isArchived {
+                Button {
+                    withAnimation {
+                        routine.isActive = true
+                        routine.archivedAt = nil
+                    }
+                } label: {
+                    Label("Khôi phục", systemImage: "arrow.uturn.backward")
+                }
+            } else {
+                Button {
+                    withAnimation {
+                        routine.isActive = false
+                        routine.archivedAt = Date()
+                    }
+                } label: {
+                    Label("Lưu trữ", systemImage: "archivebox")
+                }
+            }
+        }
     }
 }
 

@@ -12,12 +12,15 @@ final class Goal {
     var isLongTerm: Bool
     var createdAt: Date
     var order: Int
+    var isActive: Bool
+    var archivedAt: Date?
     
     init(
         name: String,
         icon: String = "star.fill",
         deadline: Date? = nil,
         isLongTerm: Bool = false,
+        isActive: Bool = true,
         order: Int = 0
     ) {
         self.id = UUID()
@@ -28,6 +31,8 @@ final class Goal {
         self.deadline = deadline
         self.isLongTerm = isLongTerm
         self.createdAt = Date()
+        self.isActive = isActive
+        self.archivedAt = nil
         self.order = order
     }
 }

@@ -9,6 +9,7 @@ final class Routine {
     var isActive: Bool
     var order: Int
     var createdAt: Date
+    var archivedAt: Date?
     
     @Relationship(deleteRule: .cascade, inverse: \DailyLog.routine)
     var dailyLogs: [DailyLog]?
@@ -20,5 +21,6 @@ final class Routine {
         self.isActive = isActive
         self.order = order
         self.createdAt = Date()
+        self.archivedAt = nil
     }
 }

@@ -141,8 +141,8 @@ struct SettingsView: View {
                         }
                     }
                     .card(padding: 0)
-                    .animation(.easeInOut(duration: 0.2), value: notificationsEnabled)
-                }
+                .animation(.easeInOut(duration: 0.2), value: notificationsEnabled)
+            }
                 
                 // Data Section
                 VStack(alignment: .leading, spacing: 16) {
@@ -211,7 +211,7 @@ struct SettingsView: View {
             }
             
             // App Info
-            Text("FixMyLife v1.0 | Developed by @yun.khngn")
+            Text("FixMyLife v1.1 | Developed by @yun.khngn")
                 .font(.system(size: 13))
                 .foregroundStyle(AppColors.textMuted)
                 .frame(maxWidth: .infinity)
