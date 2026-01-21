@@ -3,6 +3,7 @@ import Charts
 
 struct StatsView: View {
     @Environment(AppViewModel.self) var viewModel
+
     
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -128,6 +129,7 @@ struct StatsView: View {
         .onAppear {
             viewModel.fetchActivityData()
         }
+
     }
     
     func calculateLast7DaysData() -> [DayData] {

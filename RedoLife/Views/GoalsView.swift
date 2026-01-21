@@ -477,6 +477,7 @@ struct AddRoutineSheet: View {
     @Binding var name: String
     let onAdd: () -> Void
     @Environment(\.dismiss) var dismiss
+    @State private var showingAICoach = false
     
     var body: some View {
         VStack(spacing: 24) {
@@ -492,6 +493,19 @@ struct AddRoutineSheet: View {
                 .background(Color(hex: "F0F0F5"))
                 .cornerRadius(12)
             
+            Button {
+                showingAICoach = true
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: "sparkles")
+                    Text("Gợi ý từ AI")
+                }
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(Color.purple)
+            }
+            .buttonStyle(.plain)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            
             HStack {
                 Button("Huỷ") { dismiss() }
                     .foregroundStyle(AppColors.textMuted)
@@ -506,6 +520,10 @@ struct AddRoutineSheet: View {
         }
         .padding(24)
         .background(Color.white.ignoresSafeArea())
+        .sheet(isPresented: $showingAICoach) {
+             AIAdvisorView(initialTab: .coach)
+                .frame(minWidth: 500, minHeight: 600)
+        }
     }
 }
 

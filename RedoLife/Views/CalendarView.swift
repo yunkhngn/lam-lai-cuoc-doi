@@ -8,7 +8,8 @@ struct CalendarView: View {
     private let weekdays = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"]
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 32) {
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 32) {
             // Header
             HStack {
                 Button {
@@ -152,6 +153,8 @@ struct CalendarView: View {
             Spacer()
         }
         .padding(.horizontal, 40)
+        .padding(.bottom, 24)
+        }
         .background(AppColors.bgPrimary.ignoresSafeArea())
         .onAppear {
             viewModel.fetchMonthLogs(for: viewModel.currentMonth)

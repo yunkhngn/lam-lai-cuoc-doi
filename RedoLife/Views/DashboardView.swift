@@ -149,12 +149,6 @@ struct DashboardView: View {
                 .frame(height: 280)
                 .card(padding: 0)
                 
-                .frame(height: 280)
-                .card(padding: 0)
-                
-                // Mood Tracker (Removed)
-
-                
                 // Today's Routines
                 VStack(alignment: .leading, spacing: 16) {
                     Text("Hôm nay")
@@ -169,9 +163,9 @@ struct DashboardView: View {
                         // Empty State
                         VStack(spacing: 16) {
                             Image(systemName: "leaf.fill")
-                                .font(.system(size: 40))
-                                .foregroundStyle(AppColors.green.opacity(0.3))
-                            
+                            .font(.system(size: 40))
+                            .foregroundStyle(AppColors.green.opacity(0.3))
+                        
                             Text("Chưa có thói quen nào")
                                 .font(.system(size: 17, weight: .medium, design: .rounded))
                                 .foregroundStyle(AppColors.textPrimary)
@@ -188,7 +182,7 @@ struct DashboardView: View {
                         // Active List
                         if !activeRoutines.isEmpty {
                             VStack(spacing: 0) {
-                                    ForEach(activeRoutines) { routine in
+                                ForEach(activeRoutines) { routine in
                                     DashboardRoutineRow(routine: routine, viewModel: viewModel)
                                     
                                     if routine.id != activeRoutines.last?.id {
@@ -206,6 +200,7 @@ struct DashboardView: View {
             .padding(.horizontal, 40)
             .padding(.bottom, 40)
         }
+
         .onAppear {
             // Animate progress on appear
             animatedProgress = 0

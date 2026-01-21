@@ -27,10 +27,11 @@ struct MenuBarView: View {
                 Text("\(Int(todayPercentage * 100))%")
                     .font(.system(.body, design: .rounded))
                     .fontWeight(.bold)
-                    .foregroundStyle(todayPercentage >= 1.0 ? AppColors.green : AppColors.textPrimary)
+                    .foregroundStyle(todayPercentage >= 1.0 ? Color.green : Color.primary)
             }
             .padding(12)
-            .background(Color.white)
+            // No hardcoded background needed, let menu bar style handle it or use material
+            .background(.regularMaterial) 
             
             Divider()
             
@@ -65,7 +66,7 @@ struct MenuBarView: View {
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(.secondary)
-                .onHover { _ in } // Fix button hover issue
+                .onHover { _ in } 
                 
                 Spacer()
                 
@@ -76,7 +77,7 @@ struct MenuBarView: View {
                 .foregroundStyle(.secondary)
             }
             .padding(12)
-            .background(Color(nsColor: .windowBackgroundColor))
+            .background(.bar)
         }
         .frame(width: 280)
         .onAppear {
@@ -122,21 +123,21 @@ struct MenuBarRoutineRow: View {
                 ZStack {
                     if isDone {
                         Circle()
-                            .fill(AppColors.green)
+                            .fill(Color.green)
                             .frame(width: 18, height: 18)
                         Image(systemName: "checkmark")
                             .font(.system(size: 10, weight: .bold))
                             .foregroundStyle(.white)
                     } else {
                         Circle()
-                            .stroke(AppColors.mediumGray.opacity(0.5), lineWidth: 1.5)
+                            .stroke(Color.secondary.opacity(0.5), lineWidth: 1.5)
                             .frame(width: 18, height: 18)
                     }
                 }
                 
                 Text(routine.name)
                     .strikethrough(isDone)
-                    .foregroundStyle(isDone ? .secondary : AppColors.textPrimary)
+                    .foregroundStyle(isDone ? .secondary : .primary)
                 
                 Spacer()
             }
@@ -145,7 +146,7 @@ struct MenuBarRoutineRow: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .background(isHovering ? Color.black.opacity(0.05) : Color.clear)
+        .background(isHovering ? Color.primary.opacity(0.1) : Color.clear)
         .onHover { isHovering = $0 }
     }
 }

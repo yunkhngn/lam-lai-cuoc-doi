@@ -144,6 +144,51 @@ struct SettingsView: View {
                 .animation(.easeInOut(duration: 0.2), value: notificationsEnabled)
             }
                 
+                // AI Configuration Section
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Trợ lý AI Gemini")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(AppColors.textMuted)
+                    
+                    VStack(spacing: 0) {
+                        HStack {
+                            Image(systemName: "sparkles")
+                                .foregroundStyle(LinearGradient(colors: [.blue, .purple], startPoint: .topLeading, endPoint: .bottomTrailing))
+                            
+                            SecureField("Nhập Gemini API Key", text: Binding(
+                                get: { GeminiManager.shared.apiKey },
+                                set: { GeminiManager.shared.apiKey = $0 }
+                            ))
+                            .textFieldStyle(.plain)
+                            .foregroundStyle(AppColors.textPrimary)
+                            
+                            if !GeminiManager.shared.apiKey.isEmpty {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundStyle(AppColors.green)
+                            }
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 14)
+                        
+                        Divider()
+                        
+                        Link(destination: URL(string: "https://aistudio.google.com/app/apikey")!) {
+                            HStack {
+                                Text("Lấy API Key ở đâu?")
+                                    .font(.system(size: 13))
+                                    .foregroundStyle(AppColors.textMuted)
+                                Spacer()
+                                Image(systemName: "arrow.up.right.square")
+                                    .font(.system(size: 12))
+                                    .foregroundStyle(AppColors.textMuted)
+                            }
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 14)
+                        }
+                    }
+                    .card(padding: 0)
+                }
+                
                 // Data Section
                 VStack(alignment: .leading, spacing: 16) {
                     Text("Dữ liệu")
