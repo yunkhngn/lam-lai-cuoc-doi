@@ -72,6 +72,9 @@ class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
         
         // 4. Low Progress Checks (Default ON, cancelled dynamically)
         scheduleLowProgressReminders()
+        
+        // 5. Streak Saver (Default ON, cancelled if progress > 0)
+        scheduleStreakSaver()
     }
     
     func scheduleHourlyQuotes(interval: Int) {
@@ -111,7 +114,25 @@ class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
         }
     }
     
-    func cancelLowProgressReminders() {
+    // MARK: - Streak Saver
+    
+    func scheduleStreakSaver() {
+        // Schedule for 22:00 (10 PM)
+        scheduleNotification(
+            identifier: "streak_saver",
+            title: "🔥 Đừng để mất chuỗi!",
+            body: "Bạn sắp mất chuỗi hoàn thành. Hãy vào app và hoàn thành nốt thói quen ngay!",
+            hour: 22,
+            minute: 0
+        )
+    }
+    
+    func cancelStreakSaver() {
+        let center = UNUserNotificationCenter.current()
+        center.removePendingNotificationRequests(withIdentifiers: ["streak_saver"])
+    }
+    
+    // MARK: - Conditional Progress Reminders
         let center = UNUserNotificationCenter.current()
         let checkpoints = [9, 12, 15, 18, 21]
         let identifiers = checkpoints.map { "low_progress_\($0)" }

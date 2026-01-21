@@ -280,17 +280,21 @@ class AppViewModel {
     }
     
     func checkProgressReminders(percentage: Double) {
+        // 1. Streak Saver Logic (Critical)
+        if percentage > 0 {
+            // User did at least one thing -> Streak is saved (numerically)
+            NotificationManager.shared.cancelStreakSaver()
+        } else {
+            // No progress yet -> Schedule warning for tonight
+            NotificationManager.shared.scheduleStreakSaver()
+        }
+        
+        // 2. Low Progress Reminders (Nagging)
         if percentage >= 0.3 {
             // Good progress -> Cancel annoying reminders
             NotificationManager.shared.cancelLowProgressReminders()
         } else {
             // Low progress -> Ensure reminders are active
-            // Note: This might be redundant if already scheduled, but safe to ensuring consistency
-            // However, we avoid spamming re-schedule on every toggle if < 30%.
-            // Strategy: We rely on "Cancellation" being the main action. 
-            // Re-scheduling only happens on App Launch or if we want strict enforcement.
-            // For now, let's keep it simple: Cancel if >= 30%.
-            // If user unchecks items and drops below 30%, we could re-enable.
             NotificationManager.shared.scheduleLowProgressReminders()
         }
     }
@@ -664,6 +668,7 @@ class AppViewModel {
         if let stats = self.playerStats {
             stats.currentStreak = 7 // Force streak to match injected data
             stats.todayXP = 1200 // Arbitrary XP for visual
+            stats.lastActiveDate = calendar.startOfDay(for: Date()) // CRITICAL: Mark today as active
             
             // Trigger achievement check
             _ = AchievementManager.shared.checkUnlock(type: .onFire, context: context, stats: stats)

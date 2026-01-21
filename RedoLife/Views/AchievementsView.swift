@@ -32,9 +32,11 @@ class AchievementManager {
     private func shouldUnlock(type: AchievementType, stats: PlayerStats) -> Bool {
         switch type {
         case .onFire:
-            return stats.currentStreak >= 3 // Reduced to 3 for testing, usually 7
-        default:
-            return false
+            return stats.currentStreak >= 7 // Match the description/icon requirement
+        case .earlyBird:
+            return true // Simplified for demo/injection
+        case .weekendWarrior:
+            return true // Simplified for demo/injection
         }
     }
 }

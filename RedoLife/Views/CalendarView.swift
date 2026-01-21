@@ -282,49 +282,56 @@ struct DayCell: View {
         let dayNum = Calendar.current.component(.day, from: date)
         
         Button(action: onTap) {
-            Text("\(dayNum)")
-                .font(.system(size: 15, weight: isInStreak || isToday ? .semibold : .regular))
-                .foregroundStyle(textColor)
+            VStack(spacing: 4) {
+                // Day Number
+                ZStack {
+                    // Streak Capsule Background (only for 100% days)
+                    if isInStreak {
+                        UnevenRoundedRectangle(
+                            topLeadingRadius: connectLeft ? 0 : 14,
+                            bottomLeadingRadius: connectLeft ? 0 : 14,
+                            bottomTrailingRadius: connectRight ? 0 : 14,
+                            topTrailingRadius: connectRight ? 0 : 14
+                        )
+                        .fill(Color(red: 1.0, green: 0.6, blue: 0.2))
+                        .frame(height: 28)
+                        .padding(.leading, connectLeft ? 0 : 8) // Gọn đầu
+                        .padding(.trailing, connectRight ? 0 : 8) // Gọn cuối
+                    } else if isToday {
+                        Circle()
+                            .fill(AppColors.green)
+                            .frame(width: 28, height: 28)
+                    } else if isSelected {
+                        Circle()
+                            .stroke(AppColors.green, lineWidth: 2)
+                            .frame(width: 28, height: 28)
+                    }
+                    
+                    Text("\(dayNum)")
+                        .font(.system(size: 14, weight: isInStreak || isToday ? .semibold : .regular))
+                        .foregroundStyle(isInStreak || isToday ? .white : (isSelected ? AppColors.green : AppColors.textPrimary))
+                }
                 .frame(maxWidth: .infinity)
-                .frame(height: 40)
-                .background(backgroundShape)
+                .frame(height: 28)
+                
+                // Dot Indicator (always show)
+                Circle()
+                    .fill(dotColor)
+                    .frame(width: 6, height: 6)
+            }
+            .frame(height: 40)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }
     
-    @ViewBuilder
-    var backgroundShape: some View {
-        if isInStreak {
-            // Duolingo-style capsule: rounded edges only at streak start/end
-            UnevenRoundedRectangle(
-                topLeadingRadius: connectLeft ? 0 : 20,
-                bottomLeadingRadius: connectLeft ? 0 : 20,
-                topTrailingRadius: connectRight ? 0 : 20,
-                bottomTrailingRadius: connectRight ? 0 : 20
-            )
-            .fill(Color.orange)
-        } else if isToday {
-            Circle()
-                .fill(AppColors.green)
-                .frame(width: 36, height: 36)
-        } else if isSelected {
-            Circle()
-                .stroke(AppColors.green, lineWidth: 2)
-                .frame(width: 36, height: 36)
-        } else {
-            Color.clear
-        }
-    }
-    
-    var textColor: Color {
-        if isInStreak || isToday {
-            return .white
-        } else if isSelected {
+    var dotColor: Color {
+        if completionPercentage >= 1.0 {
             return AppColors.green
         } else if completionPercentage > 0 {
-            return AppColors.textPrimary
+            return AppColors.green.opacity(0.5)
         } else {
-            return AppColors.textMuted
+            return AppColors.lightGray
         }
     }
 }

@@ -21,6 +21,9 @@ struct FixMyLifeApp: App {
                 .preferredColorScheme(.light)
         }
         .modelContainer(dataManager.modelContainer)
+        .windowResizability(.contentSize)
+        .windowStyle(.hiddenTitleBar) // Optional: cleaner look
+        .defaultSize(width: 1000, height: 700)
         
         MenuBarExtra("RedoLife", systemImage: "leaf.fill") {
             Button("Mở ứng dụng") {
